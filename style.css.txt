@@ -1,0 +1,264 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
+
+:root {
+  --easy-color: #4caf50;
+  --medium-color: #ffc107;
+  --hard-color: #ff9800;
+  --expert-color: #f44336;
+  --crazy-color: #9c27b0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  color: #fff;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+h1 {
+  color: #00ffff;
+  margin: 20px 0;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  font-size: 2.5rem;
+}
+
+.level-selector {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  margin: 20px auto;
+  max-width: 600px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.level-selector h2 {
+  margin-bottom: 15px;
+  color: #fff;
+}
+
+.levels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.level-btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.level-btn[data-level="1"] {
+  background-color: var(--easy-color);
+}
+.level-btn[data-level="2"] {
+  background-color: var(--medium-color);
+}
+.level-btn[data-level="3"] {
+  background-color: var(--hard-color);
+}
+.level-btn[data-level="4"] {
+  background-color: var(--expert-color);
+}
+.level-btn[data-level="5"] {
+  background-color: var(--crazy-color);
+}
+
+.level-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.game-area {
+  transition: all 0.5s ease;
+}
+
+.game-area.hidden {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  font-size: 1.2rem;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.controls {
+  margin: 20px 0;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+button {
+  padding: 12px 25px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 50px;
+  background-color: #00ffff;
+  color: #000;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+}
+
+button:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 255, 255, 0.5);
+  background-color: #00e6e6;
+}
+
+button:disabled {
+  background-color: #555;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.timer {
+  color: #ffdd57;
+}
+
+.score {
+  color: #00ff88;
+}
+
+.level-display {
+  color: #ff6b6b;
+}
+
+#puzzle-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin: 20px auto;
+  width: 315px;
+  height: 315px;
+  perspective: 1000px;
+}
+
+.tile {
+  width: 100px;
+  height: 100px;
+  background-size: 300px 300px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.tile:hover {
+  transform: scale(1.05) rotateY(10deg);
+  box-shadow: 0 8px 20px rgba(0, 255, 255, 0.6);
+  z-index: 10;
+}
+
+.tile.moving {
+  animation: tileMove 0.5s ease-in-out;
+}
+
+@keyframes tileMove {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+#message {
+  margin: 20px 0;
+  font-size: 1.5rem;
+  color: #00ff88;
+  font-weight: bold;
+  min-height: 40px;
+}
+
+#preview-container {
+  width: 150px;
+  height: 150px;
+  margin: 20px auto;
+  border: 3px dashed rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: all 0.3s ease;
+}
+
+#preview-container:hover {
+  transform: scale(1.05);
+  border-color: rgba(0, 255, 255, 0.6);
+}
+
+#confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.win-animation {
+  animation: winPulse 1s infinite alternate;
+}
+
+@keyframes winPulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.05);
+  }
+}
+
+@media (max-width: 600px) {
+  .levels {
+    flex-direction: column;
+  }
+
+  #puzzle-container {
+    width: 270px;
+    height: 270px;
+  }
+
+  .tile {
+    width: 85px;
+    height: 85px;
+  }
+}

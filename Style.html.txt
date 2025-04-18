@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Puzzle Challenge</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="animate__animated animate__pulse">🧩 Super Puzzle Challenge</h1>
+
+    <div class="level-selector">
+      <h2>Select Difficulty</h2>
+      <div class="levels">
+        <button class="level-btn" data-level="1">Easy</button>
+        <button class="level-btn" data-level="2">Medium</button>
+        <button class="level-btn" data-level="3">Hard</button>
+        <button class="level-btn" data-level="4">Expert</button>
+        <button class="level-btn" data-level="5">Crazy</button>
+      </div>
+    </div>
+
+    <div class="game-area hidden">
+      <div class="game-info">
+        <div class="timer">⏳ Time Left: <span id="time">60</span> sec</div>
+        <div class="score">⭐ Score: <span id="score">0</span></div>
+        <div class="level-display">Level: <span id="current-level">1</span></div>
+      </div>
+
+      <div class="controls">
+        <button id="startBtn">Start</button>
+        <button id="tryAgainBtn" disabled>Try Again</button>
+        <button id="changeLevelBtn">Change Level</button>
+      </div>
+
+      <div id="puzzle-container"></div>
+      <div id="message"></div>
+      <div id="preview-container"></div>
+    </div>
+  </div>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="script.js"></script>
+</body>
+
+</html>
