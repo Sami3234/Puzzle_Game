@@ -6,6 +6,7 @@ let currentLevel = 1;
 let gameInterval;
 let isSoundOn = true;
 let unlockedLevels = [1];
+let isGameStarted = false;
 
 // DOM elements
 const timeDisplay = document.getElementById('time');
@@ -30,6 +31,20 @@ const levelTimes = {
   6: 35, 7: 30, 8: 25, 9: 20, 10: 15
 };
 
+// Image URLs
+const imageUrls = {
+  1: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  2: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  3: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  4: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  5: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  6: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  7: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  8: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  9: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg',
+  10: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg'
+};
+
 // Initialize the game
 function init() {
   // Load unlocked levels from localStorage
@@ -42,7 +57,12 @@ function init() {
   updateLevelButtons();
 
   // Set up event listeners
-  startBtn.addEventListener('click', startGame);
+  startBtn.addEventListener('click', () => {
+    isGameStarted = true;
+    startBtn.disabled = true;
+    startTimer();
+  });
+  
   tryAgainBtn.addEventListener('click', resetGame);
   soundBtn.addEventListener('click', toggleSound);
 
@@ -51,6 +71,17 @@ function init() {
   moveSound.volume = 0.5;
   winSound.volume = 0.5;
   loseSound.volume = 0.5;
+
+  // Preload images
+  preloadImages();
+}
+
+// Preload images
+function preloadImages() {
+  Object.values(imageUrls).forEach(url => {
+    const img = new Image();
+    img.src = url;
+  });
 }
 
 // Show specific page
@@ -78,6 +109,7 @@ function resetGame() {
   timeLeft = levelTimes[currentLevel];
   score = 0;
   moves = 0;
+  isGameStarted = false;
   
   updateUI();
   createTiles();
@@ -85,12 +117,13 @@ function resetGame() {
   startBtn.disabled = false;
   tryAgainBtn.disabled = true;
   messageDisplay.textContent = '';
+  messageDisplay.classList.remove('win-animation');
 }
 
 // Create puzzle tiles
 function createTiles() {
   puzzleContainer.innerHTML = '';
-  const imageUrl = 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg';
+  const imageUrl = imageUrls[currentLevel];
   
   const tiles = [];
   for (let i = 0; i < 8; i++) {
@@ -117,14 +150,25 @@ function createTiles() {
       tileElement.style.backgroundPosition = `-${col * 100}% -${row * 100}%`;
     }
     
+    // Add touch event listeners
+    tileElement.addEventListener('touchstart', handleTouchStart, { passive: true });
     tileElement.addEventListener('click', () => handleTileClick(tileElement));
     puzzleContainer.appendChild(tileElement);
   });
 }
 
+// Touch handling
+let touchStartX, touchStartY;
+
+function handleTouchStart(e) {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+  e.preventDefault();
+}
+
 // Handle tile click
 function handleTileClick(tile) {
-  if (startBtn.disabled) {
+  if (isGameStarted) {
     const emptyTile = document.querySelector('.tile[data-value="0"]');
     const tileIndex = Array.from(puzzleContainer.children).indexOf(tile);
     const emptyIndex = Array.from(puzzleContainer.children).indexOf(emptyTile);
