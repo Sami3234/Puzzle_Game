@@ -1,6 +1,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap");
 
 :root {
+  --primary-color: #00ffff;
+  --secondary-color: #ff00ff;
+  --tertiary-color: #ffff00;
+  --background-color: #1a1a2e;
+  --text-color: #ffffff;
+  --popup-bg: rgba(0, 0, 0, 0.9);
   --easy-color: #4caf50;
   --medium-color: #ffc107;
   --hard-color: #ff9800;
@@ -16,8 +22,8 @@
 
 body {
   font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
-  color: #fff;
+  background: linear-gradient(135deg, var(--background-color), #16213e);
+  color: var(--text-color);
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -67,27 +73,34 @@ h1 {
   transition: all 0.3s ease;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: relative;
+  overflow: hidden;
 }
 
-.level-btn[data-level="1"] {
-  background-color: var(--easy-color);
-}
-.level-btn[data-level="2"] {
-  background-color: var(--medium-color);
-}
-.level-btn[data-level="3"] {
-  background-color: var(--hard-color);
-}
-.level-btn[data-level="4"] {
-  background-color: var(--expert-color);
-}
-.level-btn[data-level="5"] {
-  background-color: var(--crazy-color);
+.level-btn.unlocked {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: #000;
 }
 
-.level-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.level-btn.locked {
+  background: linear-gradient(45deg, #333, #555);
+  color: #888;
+  cursor: not-allowed;
+}
+
+.level-btn.locked::after {
+  content: "🔒";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5rem;
+  opacity: 0.5;
+}
+
+.level-btn:hover:not(.locked) {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.4);
 }
 
 .game-area {
@@ -105,9 +118,11 @@ h1 {
   justify-content: space-around;
   margin: 20px 0;
   font-size: 1.2rem;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, 0.3);
   padding: 15px;
   border-radius: 10px;
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
 .controls {
@@ -175,11 +190,13 @@ button:disabled {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   transform-style: preserve-3d;
   position: relative;
+  border: 2px solid transparent;
 }
 
 .tile:hover {
   transform: scale(1.05) rotateY(10deg);
   box-shadow: 0 8px 20px rgba(0, 255, 255, 0.6);
+  border-color: var(--primary-color);
   z-index: 10;
 }
 
@@ -202,9 +219,21 @@ button:disabled {
 #message {
   margin: 20px 0;
   font-size: 1.5rem;
-  color: #00ff88;
+  color: var(--primary-color);
   font-weight: bold;
   min-height: 40px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  animation: textGlow 2s infinite alternate;
+}
+
+@keyframes textGlow {
+  from {
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  }
+  to {
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+                 0 0 30px rgba(255, 0, 255, 0.6);
+  }
 }
 
 #preview-container {
@@ -261,4 +290,71 @@ button:disabled {
     width: 85px;
     height: 85px;
   }
+}
+
+/* Popup Styles */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--popup-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+}
+
+.popup-content {
+  background: linear-gradient(135deg, #2a2a4a, #1a1a2e);
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+  border: 2px solid var(--primary-color);
+  animation: glow 2s infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.6),
+                0 0 40px rgba(255, 0, 255, 0.4);
+  }
+}
+
+.popup h2 {
+  color: var(--primary-color);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.popup p {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: var(--text-color);
+}
+
+.popup-btn {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: #000;
+  padding: 15px 40px;
+  font-size: 1.5rem;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+}
+
+.popup-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 20px rgba(0, 255, 255, 0.6);
 }

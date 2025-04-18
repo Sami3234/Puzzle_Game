@@ -4,23 +4,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Super Puzzle Challenge</title>
+  <title>Imran Khan Puzzle Challenge</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <!-- Welcome Popup -->
+  <div id="welcome-popup" class="popup">
+    <div class="popup-content">
+      <h2 class="animate__animated animate__bounceIn">Welcome to Imran Khan Puzzle Challenge! 🎮</h2>
+      <p class="animate__animated animate__fadeIn">Test your skills with this exciting sliding puzzle game!</p>
+      <button id="start-now-btn" class="popup-btn animate__animated animate__pulse animate__infinite">START NOW!</button>
+    </div>
+  </div>
+
   <div class="container">
-    <h1 class="animate__animated animate__pulse">🧩 Super Puzzle Challenge</h1>
+    <h1 class="animate__animated animate__pulse">🧩 Imran Khan Puzzle Challenge</h1>
 
     <div class="level-selector">
-      <h2>Select Difficulty</h2>
+      <h2>Select Level</h2>
       <div class="levels">
-        <button class="level-btn" data-level="1">Easy</button>
-        <button class="level-btn" data-level="2">Medium</button>
-        <button class="level-btn" data-level="3">Hard</button>
-        <button class="level-btn" data-level="4">Expert</button>
-        <button class="level-btn" data-level="5">Crazy</button>
+        <button class="level-btn unlocked" data-level="1">Level 1</button>
+        <button class="level-btn locked" data-level="2">Level 2</button>
+        <button class="level-btn locked" data-level="3">Level 3</button>
+        <button class="level-btn locked" data-level="4">Level 4</button>
+        <button class="level-btn locked" data-level="5">Level 5</button>
+        <button class="level-btn locked" data-level="6">Level 6</button>
+        <button class="level-btn locked" data-level="7">Level 7</button>
+        <button class="level-btn locked" data-level="8">Level 8</button>
+        <button class="level-btn locked" data-level="9">Level 9</button>
+        <button class="level-btn locked" data-level="10">Level 10</button>
       </div>
     </div>
 
@@ -29,12 +43,14 @@
         <div class="timer">⏳ Time Left: <span id="time">60</span> sec</div>
         <div class="score">⭐ Score: <span id="score">0</span></div>
         <div class="level-display">Level: <span id="current-level">1</span></div>
+        <div class="moves">Moves: <span id="moves">0</span></div>
       </div>
 
       <div class="controls">
         <button id="startBtn">Start</button>
         <button id="tryAgainBtn" disabled>Try Again</button>
         <button id="changeLevelBtn">Change Level</button>
+        <button id="soundBtn">🔊 Sound On</button>
       </div>
 
       <div id="puzzle-container"></div>
@@ -44,6 +60,12 @@
   </div>
 
   <canvas id="confetti-canvas"></canvas>
+
+  <!-- Audio elements -->
+  <audio id="moveSound" src="https://assets.mixkit.co/sfx/preview/mixkit-game-ball-tap-2073.mp3"></audio>
+  <audio id="winSound" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio>
+  <audio id="loseSound" src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-lose-2027.mp3"></audio>
+  <audio id="backgroundMusic" src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-668.mp3" loop></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="script.js"></script>

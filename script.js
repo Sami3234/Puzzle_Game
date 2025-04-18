@@ -4,39 +4,62 @@ document.addEventListener("DOMContentLoaded", () => {
   const timerDisplay = document.getElementById("time");
   const scoreDisplay = document.getElementById("score");
   const levelDisplay = document.getElementById("current-level");
+  const movesDisplay = document.getElementById("moves");
   const message = document.getElementById("message");
   const startBtn = document.getElementById("startBtn");
   const tryAgainBtn = document.getElementById("tryAgainBtn");
   const changeLevelBtn = document.getElementById("changeLevelBtn");
+  const soundBtn = document.getElementById("soundBtn");
+  const startNowBtn = document.getElementById("start-now-btn");
+  const welcomePopup = document.getElementById("welcome-popup");
   const levelSelector = document.querySelector(".level-selector");
   const gameArea = document.querySelector(".game-area");
   const previewContainer = document.getElementById("preview-container");
   const levelButtons = document.querySelectorAll(".level-btn");
+
+  // Audio elements
+  const moveSound = document.getElementById("moveSound");
+  const winSound = document.getElementById("winSound");
+  const loseSound = document.getElementById("loseSound");
+  const backgroundMusic = document.getElementById("backgroundMusic");
 
   // Game variables
   let time = 60;
   let timerInterval;
   let positions = [];
   let score = 0;
+  let moves = 0;
   let currentLevel = 1;
-  let emptyIndex = 8; // Position of empty tile
+  let emptyIndex = 8;
+  let soundEnabled = true;
+  let unlockedLevels = new Set([1]);
   let imageUrls = [
-    "https://picsum.photos/id/10/300/300", // Nature
-    "https://picsum.photos/id/11/300/300", // City
-    "https://picsum.photos/id/12/300/300", // Animal
-    "https://picsum.photos/id/13/300/300", // Space
-    "https://picsum.photos/id/14/300/300" // Art
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg",
+    "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg"
   ];
   let currentImageUrl = "";
   let imageLoaded = false;
 
   // Level time settings
   const levelTimes = {
-    1: 90, // Easy
-    2: 60, // Medium
-    3: 45, // Hard
-    4: 30, // Expert
-    5: 20 // Crazy
+    1: 90, // Level 1
+    2: 80, // Level 2
+    3: 70, // Level 3
+    4: 60, // Level 4
+    5: 50, // Level 5
+    6: 40, // Level 6
+    7: 35, // Level 7
+    8: 30, // Level 8
+    9: 25, // Level 9
+    10: 20 // Level 10
   };
 
   // Initialize the game
@@ -44,15 +67,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function init() {
     // Set up event listeners
+    startNowBtn.addEventListener("click", () => {
+      welcomePopup.style.display = "none";
+      if (soundEnabled) backgroundMusic.play();
+    });
+
     levelButtons.forEach((btn) => {
-      btn.addEventListener("click", () =>
-        selectLevel(parseInt(btn.dataset.level))
-      );
+      btn.addEventListener("click", () => {
+        const level = parseInt(btn.dataset.level);
+        if (unlockedLevels.has(level)) {
+          selectLevel(level);
+        } else {
+          if (soundEnabled) loseSound.play();
+          message.textContent = "Complete previous levels to unlock this one!";
+          message.classList.add("animate__animated", "animate__shakeX");
+          setTimeout(() => {
+            message.textContent = "";
+            message.classList.remove("animate__animated", "animate__shakeX");
+          }, 2000);
+        }
+      });
     });
 
     startBtn.addEventListener("click", startGame);
     tryAgainBtn.addEventListener("click", startGame);
     changeLevelBtn.addEventListener("click", showLevelSelector);
+    soundBtn.addEventListener("click", toggleSound);
+
+    // Update level buttons based on unlocked levels
+    updateLevelButtons();
+  }
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    soundBtn.textContent = soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
+    if (soundEnabled) {
+      backgroundMusic.play();
+    } else {
+      backgroundMusic.pause();
+    }
+  }
+
+  function updateLevelButtons() {
+    levelButtons.forEach((btn) => {
+      const level = parseInt(btn.dataset.level);
+      if (unlockedLevels.has(level)) {
+        btn.classList.remove("locked");
+        btn.classList.add("unlocked");
+      } else {
+        btn.classList.remove("unlocked");
+        btn.classList.add("locked");
+      }
+    });
   }
 
   function selectLevel(level) {
@@ -81,24 +147,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     switch (currentLevel) {
       case 1:
-        color = "var(--easy-color)";
+        color = "var(--primary-color)";
         break;
       case 2:
-        color = "var(--medium-color)";
+        color = "var(--secondary-color)";
         break;
       case 3:
-        color = "var(--hard-color)";
+        color = "var(--tertiary-color)";
         break;
-      case 4:
-        color = "var(--expert-color)";
-        break;
-      case 5:
-        color = "var(--crazy-color)";
-        break;
+      default:
+        color = `hsl(${currentLevel * 30}, 100%, 50%)`;
     }
 
     document.querySelectorAll("button:not(.level-btn)").forEach((btn) => {
-      btn.style.backgroundColor = color;
+      btn.style.background = `linear-gradient(45deg, ${color}, var(--secondary-color))`;
     });
 
     levelDisplay.style.color = color;
@@ -118,6 +180,8 @@ document.addEventListener("DOMContentLoaded", () => {
     message.textContent = "";
     startBtn.disabled = true;
     tryAgainBtn.disabled = false;
+    moves = 0;
+    movesDisplay.textContent = moves;
 
     // Reset score if it's a new game
     if (!tryAgainBtn.disabled) {
@@ -138,15 +202,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (time <= 10) {
         timerDisplay.classList.add("animate__animated", "animate__heartBeat");
         setTimeout(() => {
-          timerDisplay.classList.remove(
-            "animate__animated",
-            "animate__heartBeat"
-          );
+          timerDisplay.classList.remove("animate__animated", "animate__heartBeat");
         }, 1000);
       }
 
       if (time <= 0) {
         clearInterval(timerInterval);
+        if (soundEnabled) loseSound.play();
         message.textContent = "⏰ Time's up! Try again.";
         message.classList.add("animate__animated", "animate__shakeX");
         startBtn.disabled = false;
@@ -180,7 +242,7 @@ document.addEventListener("DOMContentLoaded", () => {
       };
       img.onerror = () => {
         // Fallback to a different image if remote fails
-        currentImageUrl = "https://picsum.photos/300/300";
+        currentImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg";
         imageLoaded = true;
         shuffleAndCreateTiles();
       };
@@ -197,12 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
     for (let i = 0; i < shuffleCount; i++) {
       const emptyPos = positions.indexOf(emptyIndex);
       const validMoves = getValidMoves(emptyPos);
-      const randomMove =
-        validMoves[Math.floor(Math.random() * validMoves.length)];
-      [positions[emptyPos], positions[randomMove]] = [
-        positions[randomMove],
-        positions[emptyPos]
-      ];
+      const randomMove = validMoves[Math.floor(Math.random() * validMoves.length)];
+      [positions[emptyPos], positions[randomMove]] = [positions[randomMove], positions[emptyPos]];
     }
 
     // Create tiles
@@ -212,17 +270,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (pos !== emptyIndex) {
         tile.style.backgroundImage = `url(${currentImageUrl})`;
-        tile.style.backgroundPosition = `-${(pos % 3) * 100}px -${
-          Math.floor(pos / 3) * 100
-        }px`;
+        tile.style.backgroundPosition = `-${(pos % 3) * 100}px -${Math.floor(pos / 3) * 100}px`;
         tile.setAttribute("data-index", index);
         tile.addEventListener("click", () => handleTileClick(index));
 
         // Add level-based animation
         if (currentLevel >= 4) {
-          tile.style.animation = `tileMove ${
-            0.5 + Math.random()
-          }s infinite alternate`;
+          tile.style.animation = `tileMove ${0.5 + Math.random()}s infinite alternate`;
         } else if (currentLevel >= 2) {
           tile.style.transition = "all 0.5s ease";
         }
@@ -235,6 +289,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Update preview
     previewContainer.style.backgroundImage = `url(${currentImageUrl})`;
+  }
+
+  function handleTileClick(index) {
+    const emptyPos = positions.indexOf(emptyIndex);
+    const clickedPos = positions.indexOf(index);
+    const validMoves = getValidMoves(emptyPos);
+
+    if (validMoves.includes(clickedPos)) {
+      if (soundEnabled) moveSound.play();
+      moves++;
+      movesDisplay.textContent = moves;
+
+      // Swap positions
+      [positions[emptyPos], positions[clickedPos]] = [positions[clickedPos], positions[emptyPos]];
+
+      // Update tiles
+      const tiles = document.querySelectorAll(".tile");
+      tiles.forEach((tile, i) => {
+        const pos = positions[i];
+        if (pos !== emptyIndex) {
+          tile.style.backgroundPosition = `-${(pos % 3) * 100}px -${Math.floor(pos / 3) * 100}px`;
+        }
+      });
+
+      // Check for win
+      if (checkWin()) {
+        clearInterval(timerInterval);
+        if (soundEnabled) winSound.play();
+        message.textContent = "🎉 Congratulations! You won!";
+        message.classList.add("animate__animated", "animate__bounce");
+        
+        // Update score
+        score += (time * currentLevel);
+        scoreDisplay.textContent = score;
+
+        // Unlock next level
+        if (currentLevel < 10) {
+          unlockedLevels.add(currentLevel + 1);
+          updateLevelButtons();
+        }
+
+        // Show confetti
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        startBtn.disabled = false;
+        tryAgainBtn.disabled = true;
+      }
+    }
+  }
+
+  function checkWin() {
+    return positions.every((pos, index) => pos === index);
   }
 
   function getValidMoves(position) {
@@ -252,87 +362,5 @@ document.addEventListener("DOMContentLoaded", () => {
     if (col < 2) moves.push(position + 1);
 
     return moves;
-  }
-
-  function handleTileClick(index) {
-    const emptyPos = positions.indexOf(emptyIndex);
-    const validMoves = getValidMoves(emptyPos);
-
-    if (validMoves.includes(index)) {
-      // Add move animation
-      const tile = puzzleContainer.children[index];
-      tile.classList.add("moving");
-      setTimeout(() => tile.classList.remove("moving"), 500);
-
-      // Update positions
-      [positions[index], positions[emptyPos]] = [
-        positions[emptyPos],
-        positions[index]
-      ];
-
-      // Update score
-      score += currentLevel * 5;
-      scoreDisplay.textContent = score;
-
-      // Recreate tiles with new positions
-      createTiles();
-      checkWin();
-    } else {
-      // Invalid move feedback
-      const tile = puzzleContainer.children[index];
-      tile.classList.add("animate__animated", "animate__headShake");
-      setTimeout(() => {
-        tile.classList.remove("animate__animated", "animate__headShake");
-      }, 1000);
-    }
-  }
-
-  function checkWin() {
-    const isWin = positions.every((val, i) => val === i);
-
-    if (isWin) {
-      clearInterval(timerInterval);
-
-      // Calculate bonus points based on time left
-      const timeBonus = Math.floor(time * currentLevel * 0.5);
-      score += timeBonus;
-      scoreDisplay.textContent = score;
-
-      // Show win message
-      message.textContent = `🎉 You Win! Time Bonus: +${timeBonus} points`;
-      message.classList.add(
-        "animate__animated",
-        "animate__bounceIn",
-        "win-animation"
-      );
-
-      // Confetti effect
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: [
-          "#ff0000",
-          "#00ff00",
-          "#0000ff",
-          "#ffff00",
-          "#ff00ff",
-          "#00ffff"
-        ]
-      });
-
-      startBtn.disabled = false;
-      tryAgainBtn.disabled = true;
-
-      // Auto-advance to next level after delay (if not max level)
-      if (currentLevel < 5) {
-        setTimeout(() => {
-          currentLevel++;
-          levelDisplay.textContent = currentLevel;
-          updateLevelUI();
-          startGame();
-        }, 3000);
-      }
-    }
   }
 });
