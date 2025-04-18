@@ -10,52 +10,62 @@
 </head>
 
 <body>
-  <!-- Welcome Popup -->
-  <div id="welcome-popup" class="popup">
-    <div class="popup-content">
-      <h2 class="animate__animated animate__bounceIn">Welcome to Imran Khan Puzzle Challenge! 🎮</h2>
+  <!-- Welcome Page -->
+  <div id="welcome-page" class="page active">
+    <div class="welcome-content">
+      <h1 class="animate__animated animate__bounceIn">Imran Khan Puzzle Challenge</h1>
+      <div class="welcome-image">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg" alt="Imran Khan">
+      </div>
       <p class="animate__animated animate__fadeIn">Test your skills with this exciting sliding puzzle game!</p>
-      <button id="start-now-btn" class="popup-btn animate__animated animate__pulse animate__infinite">START NOW!</button>
+      <button onclick="showPage('levels-page')" class="start-btn animate__animated animate__pulse animate__infinite">
+        START GAME
+      </button>
     </div>
   </div>
 
-  <div class="container">
-    <h1 class="animate__animated animate__pulse">🧩 Imran Khan Puzzle Challenge</h1>
-
-    <div class="level-selector">
-      <h2>Select Level</h2>
-      <div class="levels">
-        <button class="level-btn unlocked" data-level="1">Level 1</button>
-        <button class="level-btn locked" data-level="2">Level 2</button>
-        <button class="level-btn locked" data-level="3">Level 3</button>
-        <button class="level-btn locked" data-level="4">Level 4</button>
-        <button class="level-btn locked" data-level="5">Level 5</button>
-        <button class="level-btn locked" data-level="6">Level 6</button>
-        <button class="level-btn locked" data-level="7">Level 7</button>
-        <button class="level-btn locked" data-level="8">Level 8</button>
-        <button class="level-btn locked" data-level="9">Level 9</button>
-        <button class="level-btn locked" data-level="10">Level 10</button>
-      </div>
+  <!-- Levels Page -->
+  <div id="levels-page" class="page">
+    <div class="levels-header">
+      <h1>Select Level</h1>
+      <button onclick="showPage('welcome-page')" class="back-btn">← Back</button>
     </div>
+    
+    <div class="levels-grid">
+      <button class="level-btn unlocked" onclick="startGame(1)">Level 1</button>
+      <button class="level-btn locked" onclick="startGame(2)">Level 2</button>
+      <button class="level-btn locked" onclick="startGame(3)">Level 3</button>
+      <button class="level-btn locked" onclick="startGame(4)">Level 4</button>
+      <button class="level-btn locked" onclick="startGame(5)">Level 5</button>
+      <button class="level-btn locked" onclick="startGame(6)">Level 6</button>
+      <button class="level-btn locked" onclick="startGame(7)">Level 7</button>
+      <button class="level-btn locked" onclick="startGame(8)">Level 8</button>
+      <button class="level-btn locked" onclick="startGame(9)">Level 9</button>
+      <button class="level-btn locked" onclick="startGame(10)">Level 10</button>
+    </div>
+  </div>
 
-    <div class="game-area hidden">
+  <!-- Game Page -->
+  <div id="game-page" class="page">
+    <div class="game-header">
+      <button onclick="showPage('levels-page')" class="back-btn">← Back</button>
       <div class="game-info">
-        <div class="timer">⏳ Time Left: <span id="time">60</span> sec</div>
-        <div class="score">⭐ Score: <span id="score">0</span></div>
+        <div class="timer">⏳ <span id="time">60</span>s</div>
+        <div class="score">⭐ <span id="score">0</span></div>
         <div class="level-display">Level: <span id="current-level">1</span></div>
         <div class="moves">Moves: <span id="moves">0</span></div>
       </div>
+    </div>
 
-      <div class="controls">
-        <button id="startBtn">Start</button>
-        <button id="tryAgainBtn" disabled>Try Again</button>
-        <button id="changeLevelBtn">Change Level</button>
-        <button id="soundBtn">🔊 Sound On</button>
-      </div>
-
+    <div class="game-area">
       <div id="puzzle-container"></div>
       <div id="message"></div>
-      <div id="preview-container"></div>
+    </div>
+
+    <div class="game-controls">
+      <button id="startBtn">Start</button>
+      <button id="tryAgainBtn" disabled>Try Again</button>
+      <button id="soundBtn">🔊 Sound On</button>
     </div>
   </div>
 
@@ -68,7 +78,7 @@
   <audio id="backgroundMusic" src="https://assets.mixkit.co/music/preview/mixkit-game-show-suspense-waiting-668.mp3" loop></audio>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="script.js"></script>
+  <script src="game.js"></script>
 </body>
 
 </html>
