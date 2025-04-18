@@ -20,36 +20,49 @@
   padding: 0;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   font-family: "Poppins", sans-serif;
   background: linear-gradient(135deg, var(--background-color), #16213e);
   color: var(--text-color);
   min-height: 100vh;
   overflow-x: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 .container {
-  max-width: 800px;
+  max-width: 100%;
+  height: 100vh;
   margin: 0 auto;
-  padding: 20px;
+  padding: 10px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 h1 {
   color: #00ffff;
-  margin: 20px 0;
+  margin: 10px 0;
   text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-  font-size: 2.5rem;
+  font-size: 1.8rem;
 }
 
 .level-selector {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-radius: 15px;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 600px;
+  padding: 15px;
+  margin: 10px auto;
+  max-width: 100%;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  overflow-y: auto;
+  max-height: 40vh;
 }
 
 .level-selector h2 {
@@ -58,15 +71,15 @@ h1 {
 }
 
 .levels {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 5px;
 }
 
 .level-btn {
-  padding: 12px 25px;
-  font-size: 1rem;
+  padding: 8px 15px;
+  font-size: 0.9rem;
   border: none;
   border-radius: 50px;
   cursor: pointer;
@@ -75,6 +88,8 @@ h1 {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   position: relative;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .level-btn.unlocked {
@@ -105,6 +120,10 @@ h1 {
 
 .game-area {
   transition: all 0.5s ease;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .game-area.hidden {
@@ -114,27 +133,29 @@ h1 {
 }
 
 .game-info {
-  display: flex;
-  justify-content: space-around;
-  margin: 20px 0;
-  font-size: 1.2rem;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 5px;
+  margin: 10px 0;
+  font-size: 1rem;
   background: rgba(0, 0, 0, 0.3);
-  padding: 15px;
+  padding: 10px;
   border-radius: 10px;
   border: 1px solid var(--primary-color);
   box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
 }
 
 .controls {
-  margin: 20px 0;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
+  margin: 10px 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 0 10px;
 }
 
 button {
-  padding: 12px 25px;
-  font-size: 1rem;
+  padding: 8px 15px;
+  font-size: 0.9rem;
   border: none;
   border-radius: 50px;
   background-color: #00ffff;
@@ -143,6 +164,9 @@ button {
   transition: all 0.3s ease;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 button:hover:not(:disabled) {
@@ -172,16 +196,17 @@ button:disabled {
 #puzzle-container {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
-  margin: 20px auto;
-  width: 315px;
-  height: 315px;
+  gap: 3px;
+  margin: 10px auto;
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 1;
   perspective: 1000px;
 }
 
 .tile {
-  width: 100px;
-  height: 100px;
+  width: 100%;
+  aspect-ratio: 1;
   background-size: 300px 300px;
   background-repeat: no-repeat;
   cursor: pointer;
@@ -237,20 +262,20 @@ button:disabled {
 }
 
 #preview-container {
-  width: 150px;
-  height: 150px;
-  margin: 20px auto;
+  width: 100px;
+  height: 100px;
+  margin: 10px auto;
   border: 3px dashed rgba(255, 255, 255, 0.3);
   border-radius: 10px;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   transition: all 0.3s ease;
+  display: none;
 }
 
-#preview-container:hover {
-  transform: scale(1.05);
-  border-color: rgba(0, 255, 255, 0.6);
+#preview-container.show {
+  display: block;
 }
 
 #confetti-canvas {

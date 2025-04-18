@@ -47,6 +47,38 @@ document.addEventListener("DOMContentLoaded", () => {
   ];
   let currentImageUrl = "";
   let imageLoaded = false;
+  let preloadedImages = new Map();
+
+  // Preload all images
+  function preloadImages() {
+    imageUrls.forEach((url, index) => {
+      const img = new Image();
+      img.onload = () => {
+        preloadedImages.set(index, img);
+        if (index === 0) {
+          currentImageUrl = url;
+          imageLoaded = true;
+          previewContainer.style.backgroundImage = `url(${url})`;
+        }
+      };
+      img.onerror = () => {
+        console.error(`Failed to load image: ${url}`);
+        // Fallback to a different image
+        const fallbackUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg";
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          preloadedImages.set(index, fallbackImg);
+          if (index === 0) {
+            currentImageUrl = fallbackUrl;
+            imageLoaded = true;
+            previewContainer.style.backgroundImage = `url(${fallbackUrl})`;
+          }
+        };
+        fallbackImg.src = fallbackUrl;
+      };
+      img.src = url;
+    });
+  }
 
   // Level time settings
   const levelTimes = {
@@ -66,6 +98,9 @@ document.addEventListener("DOMContentLoaded", () => {
   init();
 
   function init() {
+    // Preload images
+    preloadImages();
+
     // Set up event listeners
     startNowBtn.addEventListener("click", () => {
       welcomePopup.style.display = "none";
@@ -129,8 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Set different image for each level
     currentImageUrl = imageUrls[level - 1];
-    imageLoaded = false;
-    previewContainer.style.backgroundImage = `url(${currentImageUrl})`;
+    imageLoaded = preloadedImages.has(level - 1);
+    if (imageLoaded) {
+      previewContainer.style.backgroundImage = `url(${currentImageUrl})`;
+      previewContainer.classList.add("show");
+    }
 
     // Show game area and hide level selector
     levelSelector.classList.add("hidden");
@@ -171,6 +209,7 @@ document.addEventListener("DOMContentLoaded", () => {
     gameArea.classList.add("hidden");
     levelSelector.classList.remove("hidden");
     message.textContent = "";
+    previewContainer.classList.remove("show");
   }
 
   function startGame() {
@@ -182,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tryAgainBtn.disabled = false;
     moves = 0;
     movesDisplay.textContent = moves;
+    previewContainer.classList.remove("show");
 
     // Reset score if it's a new game
     if (!tryAgainBtn.disabled) {
@@ -221,7 +261,6 @@ document.addEventListener("DOMContentLoaded", () => {
     puzzleContainer.innerHTML = "";
     positions = [...Array(9).keys()];
 
-    // Show loading message
     if (!imageLoaded) {
       const loadingMsg = document.createElement("div");
       loadingMsg.textContent = "Loading image...";
@@ -233,19 +272,26 @@ document.addEventListener("DOMContentLoaded", () => {
       loadingMsg.style.justifyContent = "center";
       puzzleContainer.appendChild(loadingMsg);
 
-      // Preload image
+      // Try to load the image again
       const img = new Image();
-      img.src = currentImageUrl;
       img.onload = () => {
         imageLoaded = true;
+        preloadedImages.set(currentLevel - 1, img);
         shuffleAndCreateTiles();
       };
       img.onerror = () => {
-        // Fallback to a different image if remote fails
-        currentImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg";
-        imageLoaded = true;
-        shuffleAndCreateTiles();
+        // Fallback to a different image
+        const fallbackUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Imran_Khan_in_December_2023.jpg/800px-Imran_Khan_in_December_2023.jpg";
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          imageLoaded = true;
+          preloadedImages.set(currentLevel - 1, fallbackImg);
+          currentImageUrl = fallbackUrl;
+          shuffleAndCreateTiles();
+        };
+        fallbackImg.src = fallbackUrl;
       };
+      img.src = currentImageUrl;
     } else {
       shuffleAndCreateTiles();
     }
@@ -286,9 +332,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
       puzzleContainer.appendChild(tile);
     });
-
-    // Update preview
-    previewContainer.style.backgroundImage = `url(${currentImageUrl})`;
   }
 
   function handleTileClick(index) {
