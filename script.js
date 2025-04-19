@@ -8,6 +8,7 @@ let isMusicOn = true;
 let unlockedLevels = [1];
 let completedLevels = [];
 let maxTime = 60; // Default 1 minute for level 1
+let imagesLoaded = false;
 
 // DOM Elements
 const welcomeModal = document.getElementById('welcome-modal');
@@ -30,22 +31,22 @@ const moveSound = document.getElementById('move-sound');
 const winSound = document.getElementById('win-sound');
 const backgroundMusic = document.getElementById('background-music');
 
-// Image URLs for each level - different images for each level
+// Image URLs for each level - using GitHub-friendly image hosting
 const levelImages = [
-    'https://images.unsplash.com/photo-1541963463532-d68292c34b19?q=80&w=500',
-    'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=500',
-    'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=500',
-    'https://images.unsplash.com/photo-1682685797439-a05dd915cee5?q=80&w=500',
-    'https://images.unsplash.com/photo-1579546929662-711aa81148cf?q=80&w=500',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=500',
-    'https://images.unsplash.com/photo-1508919801845-fc2ae1bc2a28?q=80&w=500',
-    'https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=500',
-    'https://images.unsplash.com/photo-1604077198996-4eb67c32cf34?q=80&w=500',
-    'https://images.unsplash.com/photo-1560759226-14da22a643ef?q=80&w=500'
+    'https://i.imgur.com/kCpL5D3.jpg', // Colorful abstract 1
+    'https://i.imgur.com/zVVPh2n.jpg', // Mountains
+    'https://i.imgur.com/xUoiZJx.jpg', // Colorful gradient
+    'https://i.imgur.com/oNoTgAe.jpg', // Beach sunset
+    'https://i.imgur.com/rHnZmAr.jpg', // Forest
+    'https://i.imgur.com/d9hjBCL.jpg', // Woman portrait
+    'https://i.imgur.com/MZIerRe.jpg', // City night
+    'https://i.imgur.com/vVGaI4Q.jpg', // Tech abstract
+    'https://i.imgur.com/NYfY1D5.jpg', // Flowers 
+    'https://i.imgur.com/vzFHgGu.jpg'  // Abstract colors
 ];
 
 // Fallback image in case the main images fail to load
-const fallbackImage = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500';
+const fallbackImage = 'https://i.imgur.com/ZUe4GKj.jpg'; // Simple pattern
 
 // Level time settings (in seconds): 60s for level 1, 120s for level 2, etc.
 const levelTimes = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600];
@@ -64,18 +65,62 @@ function init() {
 
 // Preload all images to avoid loading issues
 function preloadImages() {
-    const imagePromises = levelImages.map((url) => {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.src = url;
-            img.onload = () => resolve(img);
-            img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
-        });
+    const loadingMessage = document.createElement('div');
+    loadingMessage.style.position = 'fixed';
+    loadingMessage.style.bottom = '10px';
+    loadingMessage.style.left = '10px';
+    loadingMessage.style.background = 'rgba(0,0,0,0.7)';
+    loadingMessage.style.color = 'white';
+    loadingMessage.style.padding = '5px 10px';
+    loadingMessage.style.borderRadius = '5px';
+    loadingMessage.style.zIndex = '9999';
+    loadingMessage.textContent = 'Loading images...';
+    document.body.appendChild(loadingMessage);
+
+    // Create an array to hold all images
+    const preloadedImages = [];
+    let loadedCount = 0;
+    
+    // Create a function to update loading status
+    const updateLoadingStatus = () => {
+        loadedCount++;
+        loadingMessage.textContent = `Loading images: ${loadedCount}/${levelImages.length}`;
+        
+        if (loadedCount >= levelImages.length) {
+            loadingMessage.textContent = 'All images loaded!';
+            imagesLoaded = true;
+            
+            // Remove the message after 1 second
+            setTimeout(() => {
+                document.body.removeChild(loadingMessage);
+            }, 1000);
+        }
+    };
+
+    // Preload all level images
+    levelImages.forEach((url, index) => {
+        const img = new Image();
+        img.onload = () => {
+            preloadedImages[index] = img;
+            updateLoadingStatus();
+        };
+        img.onerror = () => {
+            // If error, use fallback and continue
+            console.error(`Failed to load image: ${url}`);
+            const fallbackImg = new Image();
+            fallbackImg.src = fallbackImage;
+            preloadedImages[index] = fallbackImg;
+            updateLoadingStatus();
+            
+            // Replace the failed URL with fallback in the levelImages array
+            levelImages[index] = fallbackImage;
+        };
+        img.src = url;
     });
 
-    Promise.allSettled(imagePromises).then(() => {
-        console.log('Images preloaded');
-    });
+    // Also preload the fallback
+    const fallbackImg = new Image();
+    fallbackImg.src = fallbackImage;
 }
 
 // Load game progress from localStorage
@@ -245,12 +290,27 @@ function selectLevel(level) {
     showPage(previewPage);
     
     // Load level image with error handling
-    previewImage.style.backgroundImage = `url(${levelImages[level - 1]})`;
-    const testImg = new Image();
-    testImg.onerror = () => {
-        previewImage.style.backgroundImage = `url(${fallbackImage})`;
+    const imgUrl = levelImages[level - 1] || fallbackImage;
+    setBackgroundSafely(previewImage, imgUrl);
+}
+
+// Safe way to set background images
+function setBackgroundSafely(element, url) {
+    if (!element) return;
+    
+    // Create a temporary image to check loading
+    const tempImg = new Image();
+    
+    tempImg.onload = () => {
+        element.style.backgroundImage = `url(${url})`;
     };
-    testImg.src = levelImages[level - 1];
+    
+    tempImg.onerror = () => {
+        console.error(`Failed to load image: ${url}`);
+        element.style.backgroundImage = `url(${fallbackImage})`;
+    };
+    
+    tempImg.src = url;
 }
 
 // Start the game
@@ -274,37 +334,12 @@ function createPuzzle() {
     const tileSize = 100 / gridSize;
     const totalTiles = gridSize * gridSize;
     
+    // Get current level image or fallback
+    const currentImage = levelImages[currentLevel - 1] || fallbackImage;
+    
     // Create tiles (except the last one, which will be empty)
     for (let i = 0; i < totalTiles - 1; i++) {
-        const tile = document.createElement('div');
-        tile.className = 'tile';
-        tile.style.width = `${tileSize}%`;
-        tile.style.height = `${tileSize}%`;
-        
-        // Calculate background position
-        const row = Math.floor(i / gridSize);
-        const col = i % gridSize;
-        
-        // Set the background image with fallback
-        const testImg = new Image();
-        testImg.onload = () => {
-            tile.style.backgroundImage = `url(${levelImages[currentLevel - 1]})`;
-            tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
-            tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
-        };
-        testImg.onerror = () => {
-            tile.style.backgroundImage = `url(${fallbackImage})`;
-            tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
-            tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
-        };
-        testImg.src = levelImages[currentLevel - 1];
-        
-        // Add data attributes for position tracking
-        tile.dataset.row = row;
-        tile.dataset.col = col;
-        
-        tile.addEventListener('click', () => moveTile(tile));
-        puzzleContainer.appendChild(tile);
+        createTile(i, gridSize, tileSize, currentImage);
     }
     
     // Add empty tile
@@ -316,8 +351,54 @@ function createPuzzle() {
     emptyTile.dataset.col = gridSize - 1;
     puzzleContainer.appendChild(emptyTile);
     
-    // Shuffle tiles
-    shuffleTiles(gridSize);
+    // Shuffle tiles after a short delay to ensure images are loaded
+    setTimeout(() => {
+        shuffleTiles(gridSize);
+    }, 500);
+}
+
+// Create a single tile
+function createTile(index, gridSize, tileSize, imageUrl) {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.style.width = `${tileSize}%`;
+    tile.style.height = `${tileSize}%`;
+    
+    // Calculate background position
+    const row = Math.floor(index / gridSize);
+    const col = index % gridSize;
+    
+    // Set the background image directly with appropriate sizing and position
+    tile.style.backgroundImage = `url(${imageUrl})`;
+    tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
+    tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
+    
+    // Add data attributes for position tracking
+    tile.dataset.row = row;
+    tile.dataset.col = col;
+    
+    tile.addEventListener('click', () => moveTile(tile));
+    puzzleContainer.appendChild(tile);
+    
+    // Handle load errors
+    const tempImg = new Image();
+    tempImg.onerror = () => {
+        // If image fails to load, use a colored background instead
+        const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+        const colorIndex = (row * gridSize + col) % colors.length;
+        tile.style.backgroundImage = 'none';
+        tile.style.backgroundColor = colors[colorIndex];
+        
+        // Add text showing position
+        tile.textContent = index + 1;
+        tile.style.display = 'flex';
+        tile.style.justifyContent = 'center';
+        tile.style.alignItems = 'center';
+        tile.style.fontSize = '1.5rem';
+        tile.style.fontWeight = 'bold';
+        tile.style.color = 'white';
+    };
+    tempImg.src = imageUrl;
 }
 
 // Shuffle the tiles
@@ -396,14 +477,16 @@ function swapTiles(tile1, tile2) {
     [tile1.dataset.col, tile2.dataset.col] = [tile2.dataset.col, tile1.dataset.col];
     
     // Swap position in the grid
-    const temp = tile1.style.gridArea;
-    tile1.style.gridArea = tile2.style.gridArea;
-    tile2.style.gridArea = temp;
+    const tempPos = tile1.style.order;
+    tile1.style.order = tile2.style.order;
+    tile2.style.order = tempPos;
     
-    // Swap background position
-    const tempBg = tile1.style.backgroundPosition;
-    tile1.style.backgroundPosition = tile2.style.backgroundPosition;
-    tile2.style.backgroundPosition = tempBg;
+    // Swap background position if not empty tile
+    if (!tile1.classList.contains('empty') && !tile2.classList.contains('empty')) {
+        const tempBg = tile1.style.backgroundPosition;
+        tile1.style.backgroundPosition = tile2.style.backgroundPosition;
+        tile2.style.backgroundPosition = tempBg;
+    }
 }
 
 // Check if the puzzle is solved
