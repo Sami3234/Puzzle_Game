@@ -537,4 +537,23 @@ button {
 
 #reset-button:hover {
     background-color: #c0392b;
+}
+
+/* Add animations for placing and moving gotis */
+.cell.placed {
+    animation: placeGoti 0.3s ease-in-out;
+}
+
+.cell.moved {
+    animation: moveGoti 0.3s ease-in-out;
+}
+
+@keyframes placeGoti {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes moveGoti {
+    from { transform: translateY(-10px); opacity: 0.5; }
+    to { transform: translateY(0); opacity: 1; }
 } 

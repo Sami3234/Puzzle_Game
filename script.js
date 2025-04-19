@@ -12,6 +12,8 @@ let imagesLoaded = false;
 let useColorMode = true; // Set to true to force color mode instead of images
 let currentPlayer = 1; // 1 for Player 1, 2 for Player 2 (AI)
 let board = Array(9).fill(null);
+let player1Goti = 3;
+let player2Goti = 3;
 
 // Add power-ups and special effects
 let powerUpActive = false;
@@ -628,9 +630,17 @@ function handleCellClick(event) {
     const cell = event.target;
     const index = cell.dataset.index;
 
-    if (!cell.classList.contains('cell') || board[index] !== null) return;
+    if (!cell.classList.contains('cell')) return;
 
-    makeMove(index, currentPlayer);
+    if (board[index] === null && (currentPlayer === 1 && player1Goti > 0 || currentPlayer === 2 && player2Goti > 0)) {
+        makeMove(index, currentPlayer);
+        if (currentPlayer === 1) player1Goti--;
+        else player2Goti--;
+    } else if (board[index] === currentPlayer) {
+        // Allow moving the goti
+        moveGoti(index);
+    }
+
     if (checkWin(currentPlayer)) {
         alert(`Player ${currentPlayer} wins!`);
         resetGame();
@@ -649,6 +659,17 @@ function makeMove(index, player) {
     board[index] = player;
     const cell = gameBoard.querySelector(`.cell[data-index='${index}']`);
     cell.textContent = player === 1 ? 'X' : 'O';
+    cell.classList.add('placed');
+    setTimeout(() => cell.classList.remove('placed'), 300);
+}
+
+// Move a goti
+function moveGoti(index) {
+    board[index] = null;
+    const cell = gameBoard.querySelector(`.cell[data-index='${index}']`);
+    cell.textContent = '';
+    cell.classList.add('moved');
+    setTimeout(() => cell.classList.remove('moved'), 300);
 }
 
 // AI move
@@ -688,6 +709,8 @@ function resetGame() {
     board.fill(null);
     gameBoard.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
     currentPlayer = 1;
+    player1Goti = 3;
+    player2Goti = 3;
     updatePlayerTurnDisplay();
 }
 
