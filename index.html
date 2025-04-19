@@ -3,112 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sliding Puzzle Game</title>
+    <title>Barah Goti Game</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Add preloading for critical images -->
-    <link rel="preload" href="https://i.imgur.com/kCpL5D3.jpg" as="image">
-    <link rel="preload" href="https://i.imgur.com/ZUe4GKj.jpg" as="image">
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay">
-        <div class="loader"></div>
-        <p>Loading game assets...</p>
-    </div>
-
-    <!-- Welcome Popup -->
-    <div id="welcome-modal" class="modal">
-        <div class="modal-content">
-            <h1>Welcome to Sliding Puzzle!</h1>
-            <p>Test your skills by solving these challenging puzzles.</p>
-            <button id="start-game" class="btn-primary">Start Game</button>
+    <header>
+        <h1>Barah Goti Game</h1>
+        <div id="game-info">
+            <span id="player-turn">Player 1's Turn</span>
+            <span id="score">Player 1: 0 | Player 2: 0</span>
         </div>
-    </div>
-
-    <!-- Level Selection Page -->
-    <div id="level-select-page" class="page">
-        <header>
-            <h1>Select Level</h1>
-            <button id="menu-btn" class="menu-btn">☰</button>
-        </header>
-        <div id="levels-grid" class="levels"></div>
-    </div>
-
-    <!-- Preview Page -->
-    <div id="preview-page" class="page">
-        <header>
-            <button id="back-to-levels" class="btn-secondary">← Back</button>
-            <h1>Preview</h1>
-        </header>
-        <div id="preview-container">
-            <div id="preview-image"></div>
-            <button id="start-puzzle" class="btn-primary">Start Puzzle</button>
+    </header>
+    <main>
+        <div id="game-board" class="board">
+            <!-- 3x3 grid for the game -->
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
         </div>
-    </div>
-
-    <!-- Game Page -->
-    <div id="game-page" class="page">
-        <header>
-            <button id="back-to-preview" class="btn-secondary">← Back</button>
-            <div class="game-info">
-                <span id="timer">00:00</span>
-                <span id="moves">0</span>
-                <span id="level">1</span>
-            </div>
-            <button id="game-menu-btn" class="menu-btn">☰</button>
-        </header>
-        <div id="puzzle-container"></div>
-        <div id="message"></div>
-    </div>
-
-    <!-- Menu Modal -->
-    <div id="menu-modal" class="modal">
-        <div class="modal-content">
-            <h2>Menu</h2>
-            <button id="sound-toggle" class="sound-on">Sound: ON</button>
-            <button id="music-toggle" class="music-on">Music: ON</button>
-            <button id="instructions-btn">Instructions</button>
-            <button id="reset-btn">Reset Progress</button>
-            <button class="close-modal">Close</button>
-        </div>
-    </div>
-
-    <!-- Instructions Modal -->
-    <div id="instructions-modal" class="modal">
-        <div class="modal-content">
-            <h2>How to Play</h2>
-            <p>1. Click on a tile adjacent to the empty space to move it.</p>
-            <p>2. Arrange all tiles to complete the image.</p>
-            <p>3. Complete the puzzle within the time limit.</p>
-            <p>4. Each level increases in difficulty with more tiles.</p>
-            <button class="close-modal">Close</button>
-        </div>
-    </div>
-
-    <!-- Win Modal -->
-    <div id="win-modal" class="modal">
-        <div class="modal-content">
-            <h2>Level Complete!</h2>
-            <p>Level: <span id="win-level">1</span></p>
-            <p>Moves: <span id="win-moves">0</span></p>
-            <p>Time: <span id="win-time">00:00</span></p>
-            <button id="next-level" class="btn-primary">Next Level</button>
-            <button id="back-to-levels-win" class="btn-secondary">Level Selection</button>
-        </div>
-    </div>
-
-    <!-- Fallback Message -->
-    <noscript>
-        <div style="padding: 20px; background: #f44336; color: white; text-align: center;">
-            This game requires JavaScript to run. Please enable JavaScript in your browser settings.
-        </div>
-    </noscript>
-
-    <!-- Audio Elements -->
-    <audio id="move-sound" src="https://cdn.freesound.org/previews/240/240776_4107740-lq.mp3"></audio>
-    <audio id="win-sound" src="https://cdn.freesound.org/previews/270/270402_5123851-lq.mp3"></audio>
-    <audio id="background-music" src="https://cdn.freesound.org/previews/511/511089_8156257-lq.mp3" loop></audio>
-
+        <button id="reset-button">Reset Game</button>
+    </main>
     <script src="script.js"></script>
 </body>
 </html> 

@@ -10,6 +10,8 @@ let completedLevels = [];
 let maxTime = 60; // Default 1 minute for level 1
 let imagesLoaded = false;
 let useColorMode = true; // Set to true to force color mode instead of images
+let currentPlayer = 1; // 1 for Player 1, 2 for Player 2 (AI)
+let board = Array(9).fill(null);
 
 // Add power-ups and special effects
 let powerUpActive = false;
@@ -35,6 +37,11 @@ const messageDisplay = document.getElementById('message');
 const moveSound = document.getElementById('move-sound');
 const winSound = document.getElementById('win-sound');
 const backgroundMusic = document.getElementById('background-music');
+
+const gameBoard = document.getElementById('game-board');
+const playerTurnDisplay = document.getElementById('player-turn');
+const scoreDisplay = document.getElementById('score');
+const resetButton = document.getElementById('reset-button');
 
 // Define gradients for each level
 const levelColors = [
@@ -91,6 +98,10 @@ function init() {
         }
         setupEventListeners();
     }, 1500);
+
+    gameBoard.addEventListener('click', handleCellClick);
+    resetButton.addEventListener('click', resetGame);
+    updatePlayerTurnDisplay();
 }
 
 // Load game progress from localStorage
@@ -610,6 +621,74 @@ function randomPowerUp() {
     if (Math.random() < 0.1) { // 10% chance to activate
         activatePowerUp();
     }
+}
+
+// Handle cell click
+function handleCellClick(event) {
+    const cell = event.target;
+    const index = cell.dataset.index;
+
+    if (!cell.classList.contains('cell') || board[index] !== null) return;
+
+    makeMove(index, currentPlayer);
+    if (checkWin(currentPlayer)) {
+        alert(`Player ${currentPlayer} wins!`);
+        resetGame();
+    } else if (board.every(cell => cell !== null)) {
+        alert('Draw!');
+        resetGame();
+    } else {
+        currentPlayer = currentPlayer === 1 ? 2 : 1;
+        updatePlayerTurnDisplay();
+        if (currentPlayer === 2) aiMove();
+    }
+}
+
+// Make a move
+function makeMove(index, player) {
+    board[index] = player;
+    const cell = gameBoard.querySelector(`.cell[data-index='${index}']`);
+    cell.textContent = player === 1 ? 'X' : 'O';
+}
+
+// AI move
+function aiMove() {
+    let availableMoves = board.map((val, idx) => val === null ? idx : null).filter(val => val !== null);
+    let move = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    makeMove(move, 2);
+    if (checkWin(2)) {
+        alert('AI wins!');
+        resetGame();
+    } else if (board.every(cell => cell !== null)) {
+        alert('Draw!');
+        resetGame();
+    } else {
+        currentPlayer = 1;
+        updatePlayerTurnDisplay();
+    }
+}
+
+// Check for a win
+function checkWin(player) {
+    const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+        [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+        [0, 4, 8], [2, 4, 6]            // Diagonals
+    ];
+    return winPatterns.some(pattern => pattern.every(index => board[index] === player));
+}
+
+// Update player turn display
+function updatePlayerTurnDisplay() {
+    playerTurnDisplay.textContent = `Player ${currentPlayer}'s Turn`;
+}
+
+// Reset the game
+function resetGame() {
+    board.fill(null);
+    gameBoard.querySelectorAll('.cell').forEach(cell => cell.textContent = '');
+    currentPlayer = 1;
+    updatePlayerTurnDisplay();
 }
 
 // Initialize the game when the page loads
