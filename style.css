@@ -481,4 +481,14 @@ button {
 
 .tile.bounce {
     animation: bounce 0.5s;
+}
+
+/* Highlight effect for power-up activation */
+.puzzle-container.highlight .tile {
+    animation: highlight 0.5s alternate infinite;
+}
+
+@keyframes highlight {
+    from { transform: scale(1); background-color: rgba(255, 255, 0, 0.5); }
+    to { transform: scale(1.1); background-color: rgba(255, 255, 0, 0.8); }
 } 

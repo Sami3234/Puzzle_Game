@@ -11,6 +11,9 @@ let maxTime = 60; // Default 1 minute for level 1
 let imagesLoaded = false;
 let useColorMode = true; // Set to true to force color mode instead of images
 
+// Add power-ups and special effects
+let powerUpActive = false;
+
 // DOM Elements
 const loadingOverlay = document.getElementById('loading-overlay');
 const welcomeModal = document.getElementById('welcome-modal');
@@ -465,6 +468,9 @@ function moveTile(tile) {
             tile.classList.remove('bounce');
         }, 300);
         
+        // Randomly activate a power-up
+        randomPowerUp();
+        
         // Check if puzzle is solved
         if (checkWin()) {
             winGame();
@@ -583,6 +589,26 @@ function playSound(sound) {
         sound.play().catch(error => {
             console.log('Audio playback error:', error);
         });
+    }
+}
+
+// Function to activate a power-up
+function activatePowerUp() {
+    if (powerUpActive) return;
+    powerUpActive = true;
+    
+    // Temporarily highlight all tiles
+    puzzleContainer.classList.add('highlight');
+    setTimeout(() => {
+        puzzleContainer.classList.remove('highlight');
+        powerUpActive = false;
+    }, 5000);
+}
+
+// Add a random power-up activation
+function randomPowerUp() {
+    if (Math.random() < 0.1) { // 10% chance to activate
+        activatePowerUp();
     }
 }
 
