@@ -470,4 +470,15 @@ button {
     content: '🎵';
     margin-right: 0.5rem;
     opacity: 0.5;
+}
+
+/* Add bounce animation for tiles */
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-10px); }
+    60% { transform: translateY(-5px); }
+}
+
+.tile.bounce {
+    animation: bounce 0.5s;
 } 

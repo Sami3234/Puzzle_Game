@@ -61,6 +61,10 @@ const levelTimes = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600];
 // Grid sizes for different levels
 const levelGridSizes = [3, 3, 4, 4, 4, 5, 5, 5, 6, 6];
 
+// Add more sound effects
+const tileMoveSound = new Audio('https://example.com/tile-move.mp3');
+const levelCompleteSound = new Audio('https://example.com/level-complete.mp3');
+
 // Initialize the game
 function init() {
     // Show loading overlay
@@ -453,7 +457,13 @@ function moveTile(tile) {
         updateDisplay();
         
         // Play move sound
-        playSound(moveSound);
+        playSound(tileMoveSound);
+        
+        // Add a bounce animation
+        tile.classList.add('bounce');
+        setTimeout(() => {
+            tile.classList.remove('bounce');
+        }, 300);
         
         // Check if puzzle is solved
         if (checkWin()) {
@@ -508,7 +518,7 @@ function checkWin() {
 // Win the game
 function winGame() {
     clearInterval(timer);
-    playSound(winSound);
+    playSound(levelCompleteSound);
     
     if (!completedLevels.includes(currentLevel)) {
         completedLevels.push(currentLevel);
