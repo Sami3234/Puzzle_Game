@@ -70,6 +70,12 @@ body {
 .page.active {
     display: flex;
     flex-direction: column;
+    animation: fadePage 0.5s ease;
+}
+
+@keyframes fadePage {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Header Styles */
@@ -140,6 +146,7 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
+    animation: modalFadeIn 0.3s ease;
 }
 
 .modal-content {
@@ -149,17 +156,25 @@ button {
     text-align: center;
     max-width: 90%;
     width: 400px;
-    animation: modalFadeIn 0.3s ease;
+    animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes modalFadeIn {
-    from {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes modalPop {
+    0% { 
         opacity: 0;
-        transform: scale(0.9);
+        transform: scale(0.8);
     }
-    to {
+    70% {
         opacity: 1;
+        transform: scale(1.05);
+    }
+    100% {
         transform: scale(1);
     }
 }
@@ -185,12 +200,30 @@ button {
     box-shadow: var(--shadow);
     border-radius: 10px;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.level-btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.level-btn:hover::after {
+    opacity: 1;
 }
 
 .level-btn.unlocked {
-    background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
     color: white;
     transform: scale(1.05);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .level-btn.unlocked:hover {
@@ -205,7 +238,17 @@ button {
 }
 
 .level-btn.completed {
-    background: linear-gradient(45deg, var(--tertiary-color), var(--primary-color));
+    position: relative;
+}
+
+.level-btn.completed::before {
+    content: '✅';
+    position: absolute;
+    top: 7px;
+    right: 7px;
+    font-size: 1rem;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 /* Preview Page Styles */
@@ -223,15 +266,14 @@ button {
     width: 100%;
     max-width: 350px;
     aspect-ratio: 1;
-    background-size: cover;
-    background-position: center;
     border-radius: 1rem;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 #preview-image:hover {
     transform: scale(1.02);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 /* Game Page Styles */
@@ -260,17 +302,29 @@ button {
 }
 
 .tile {
-    position: relative; /* Added for better positioning */
-    background-size: 300% 300%;
-    background-position: 0% 0%;
+    position: relative;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    /* Ensure tiles are rendered correctly */
-    transform-style: preserve-3d;
-    backface-visibility: hidden;
-    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.tile.moving {
+    animation: moveTile 0.2s ease;
+    z-index: 10;
+}
+
+@keyframes moveTile {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
 }
 
 .tile:hover {
@@ -285,15 +339,19 @@ button {
     box-shadow: none;
 }
 
-/* Add numbered tiles for fallback */
 .tile.numbered {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+}
+
+.tile.numbered::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+    z-index: 1;
 }
 
 .game-info {

@@ -9,6 +9,7 @@ let unlockedLevels = [1];
 let completedLevels = [];
 let maxTime = 60; // Default 1 minute for level 1
 let imagesLoaded = false;
+let useColorMode = true; // Set to true to force color mode instead of images
 
 // DOM Elements
 const loadingOverlay = document.getElementById('loading-overlay');
@@ -32,22 +33,27 @@ const moveSound = document.getElementById('move-sound');
 const winSound = document.getElementById('win-sound');
 const backgroundMusic = document.getElementById('background-music');
 
-// Image URLs for each level - using GitHub-friendly image hosting
-const levelImages = [
-    'https://i.imgur.com/kCpL5D3.jpg', // Colorful abstract 1
-    'https://i.imgur.com/zVVPh2n.jpg', // Mountains
-    'https://i.imgur.com/xUoiZJx.jpg', // Colorful gradient
-    'https://i.imgur.com/oNoTgAe.jpg', // Beach sunset
-    'https://i.imgur.com/rHnZmAr.jpg', // Forest
-    'https://i.imgur.com/d9hjBCL.jpg', // Woman portrait
-    'https://i.imgur.com/MZIerRe.jpg', // City night
-    'https://i.imgur.com/vVGaI4Q.jpg', // Tech abstract
-    'https://i.imgur.com/NYfY1D5.jpg', // Flowers 
-    'https://i.imgur.com/vzFHgGu.jpg'  // Abstract colors
+// Define gradients for each level
+const levelColors = [
+    { primary: '#3498db', secondary: '#8e44ad', text: 'Level 1 - Easy' },
+    { primary: '#e74c3c', secondary: '#f39c12', text: 'Level 2 - Beginner' },
+    { primary: '#2ecc71', secondary: '#27ae60', text: 'Level 3 - Medium' },
+    { primary: '#f1c40f', secondary: '#e67e22', text: 'Level 4 - Regular' },
+    { primary: '#9b59b6', secondary: '#8e44ad', text: 'Level 5 - Challenging' },
+    { primary: '#1abc9c', secondary: '#16a085', text: 'Level 6 - Hard' },
+    { primary: '#34495e', secondary: '#2c3e50', text: 'Level 7 - Expert' },
+    { primary: '#d35400', secondary: '#c0392b', text: 'Level 8 - Master' },
+    { primary: '#7f8c8d', secondary: '#2c3e50', text: 'Level 9 - Advanced' },
+    { primary: '#2980b9', secondary: '#3498db', text: 'Level 10 - Ultimate' }
 ];
 
-// Fallback image in case the main images fail to load
-const fallbackImage = 'https://i.imgur.com/ZUe4GKj.jpg'; // Simple pattern
+// Pattern colors for tiles
+const tilePatterns = [
+    '#3498db', '#e74c3c', '#2ecc71', '#f39c12', 
+    '#9b59b6', '#1abc9c', '#34495e', '#d35400', 
+    '#7f8c8d', '#2980b9', '#c0392b', '#27ae60',
+    '#8e44ad', '#f1c40f', '#16a085', '#2c3e50'
+];
 
 // Level time settings (in seconds): 60s for level 1, 120s for level 2, etc.
 const levelTimes = [60, 120, 180, 240, 300, 360, 420, 480, 540, 600];
@@ -64,8 +70,9 @@ function init() {
     
     loadProgress();
     createLevelButtons();
-    preloadImages().then(() => {
-        // Hide loading overlay when preloading is complete
+    
+    // Hide loading overlay after a short delay
+    setTimeout(() => {
         if (loadingOverlay) {
             loadingOverlay.style.opacity = '0';
             setTimeout(() => {
@@ -76,72 +83,7 @@ function init() {
             showWelcomeModal();
         }
         setupEventListeners();
-    }).catch(error => {
-        console.error('Error preloading images:', error);
-        // Still hide the overlay even if there was an error
-        if (loadingOverlay) {
-            loadingOverlay.style.opacity = '0';
-            setTimeout(() => {
-                loadingOverlay.style.display = 'none';
-                showWelcomeModal();
-            }, 500);
-        } else {
-            showWelcomeModal();
-        }
-        setupEventListeners();
-    });
-}
-
-// Preload all images to avoid loading issues
-function preloadImages() {
-    return new Promise((resolve) => {
-        // Create an array to hold all images
-        const preloadedImages = [];
-        let loadedCount = 0;
-        const totalImages = levelImages.length;
-        
-        // Create a function to update loading status
-        const imageLoaded = () => {
-            loadedCount++;
-            if (loadedCount >= totalImages) {
-                imagesLoaded = true;
-                resolve();
-            }
-        };
-
-        // Preload all level images
-        levelImages.forEach((url, index) => {
-            const img = new Image();
-            img.onload = () => {
-                preloadedImages[index] = img;
-                imageLoaded();
-            };
-            img.onerror = () => {
-                // If error, use fallback and continue
-                console.error(`Failed to load image: ${url}`);
-                const fallbackImg = new Image();
-                fallbackImg.src = fallbackImage;
-                preloadedImages[index] = fallbackImg;
-                
-                // Replace the failed URL with fallback in the levelImages array
-                levelImages[index] = fallbackImage;
-                imageLoaded();
-            };
-            img.src = url;
-        });
-
-        // Also preload the fallback
-        const fallbackImg = new Image();
-        fallbackImg.src = fallbackImage;
-        
-        // If no images load within 5 seconds, resolve anyway
-        setTimeout(() => {
-            if (!imagesLoaded) {
-                console.warn('Image preloading timeout - continuing anyway');
-                resolve();
-            }
-        }, 5000);
-    });
+    }, 1500);
 }
 
 // Load game progress from localStorage
@@ -182,10 +124,14 @@ function createLevelButtons() {
         const button = document.createElement('button');
         button.className = 'level-btn';
         
-        // Add emoji indicators for locked and completed levels
+        // Use level colors for the buttons
         if (unlockedLevels.includes(i)) {
             button.classList.add('unlocked');
             button.textContent = i;
+            
+            // Add gradient background
+            button.style.background = `linear-gradient(135deg, ${levelColors[i-1].primary}, ${levelColors[i-1].secondary})`;
+            
             if (completedLevels.includes(i)) {
                 button.classList.add('completed');
                 button.textContent = '✅ ' + i;
@@ -335,33 +281,28 @@ function selectLevel(level) {
         showPage(previewPage);
     }
     
-    // Load level image with error handling
+    // Set preview to use level colors
     if (previewImage) {
-        const imgUrl = levelImages[level - 1] || fallbackImage;
-        setBackgroundSafely(previewImage, imgUrl);
+        setColorPreview(previewImage, level);
     }
 }
 
-// Safe way to set background images
-function setBackgroundSafely(element, url) {
+// Set color preview for a level
+function setColorPreview(element, level) {
     if (!element) return;
     
-    // Set default background first
-    element.style.backgroundColor = '#e0e0e0';
+    const colors = levelColors[level - 1];
+    const gridSize = levelGridSizes[level - 1];
     
-    // Create a temporary image to check loading
-    const tempImg = new Image();
-    
-    tempImg.onload = () => {
-        element.style.backgroundImage = `url(${url})`;
-    };
-    
-    tempImg.onerror = () => {
-        console.error(`Failed to load image: ${url}`);
-        element.style.backgroundImage = `url(${fallbackImage})`;
-    };
-    
-    tempImg.src = url;
+    element.style.backgroundImage = `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`;
+    element.style.display = 'flex';
+    element.style.justifyContent = 'center';
+    element.style.alignItems = 'center';
+    element.style.color = 'white';
+    element.style.fontSize = '1.5rem';
+    element.style.fontWeight = 'bold';
+    element.style.textShadow = '1px 1px 3px rgba(0,0,0,0.5)';
+    element.innerHTML = `<div>${colors.text}<br>${gridSize}×${gridSize} Grid</div>`;
 }
 
 // Start the game
@@ -389,12 +330,9 @@ function createPuzzle() {
     const tileSize = 100 / gridSize;
     const totalTiles = gridSize * gridSize;
     
-    // Get current level image or fallback
-    const currentImage = levelImages[currentLevel - 1] || fallbackImage;
-    
     // Create tiles (except the last one, which will be empty)
     for (let i = 0; i < totalTiles - 1; i++) {
-        createTile(i, gridSize, tileSize, currentImage);
+        createTile(i, gridSize, tileSize);
     }
     
     // Add empty tile
@@ -404,72 +342,47 @@ function createPuzzle() {
     emptyTile.style.height = `${tileSize}%`;
     emptyTile.dataset.row = gridSize - 1;
     emptyTile.dataset.col = gridSize - 1;
+    emptyTile.dataset.index = totalTiles - 1;
     puzzleContainer.appendChild(emptyTile);
     
-    // Shuffle tiles after a short delay to ensure images are loaded
+    // Shuffle tiles after a short delay
     setTimeout(() => {
         shuffleTiles(gridSize);
-    }, 500);
+    }, 300);
 }
 
 // Create a single tile
-function createTile(index, gridSize, tileSize, imageUrl) {
+function createTile(index, gridSize, tileSize) {
     if (!puzzleContainer) return;
     
     const tile = document.createElement('div');
-    tile.className = 'tile';
+    tile.className = 'tile numbered';
     tile.style.width = `${tileSize}%`;
     tile.style.height = `${tileSize}%`;
     
-    // Calculate background position
+    // Calculate position
     const row = Math.floor(index / gridSize);
     const col = index % gridSize;
     
-    // Try setting the background image directly
-    try {
-        // Set the background image directly with appropriate sizing and position
-        tile.style.backgroundImage = `url(${imageUrl})`;
-        tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
-        tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
-    } catch (error) {
-        console.error('Error setting background image:', error);
-        // If error occurs, use fallback colored tiles
-        useFallbackTileStyle(tile, index, row, col, gridSize);
-    }
+    // Create color pattern
+    const colorIndex = index % tilePatterns.length;
+    tile.style.backgroundColor = tilePatterns[colorIndex];
+    
+    // Add number to tile
+    tile.textContent = index + 1;
+    
+    // Add gradient background for the level
+    const levelColor = levelColors[currentLevel - 1];
+    const gradientDegree = (index * 30) % 360;
+    tile.style.background = `linear-gradient(${gradientDegree}deg, ${levelColor.primary}, ${levelColor.secondary})`;
     
     // Add data attributes for position tracking
     tile.dataset.row = row;
     tile.dataset.col = col;
+    tile.dataset.index = index;
     
     tile.addEventListener('click', () => moveTile(tile));
     puzzleContainer.appendChild(tile);
-    
-    // Handle load errors - check if image load is successful after short timeout
-    setTimeout(() => {
-        // If image doesn't appear to be showing correctly (no background image or error loading)
-        const computedStyle = window.getComputedStyle(tile);
-        if (
-            !computedStyle.backgroundImage || 
-            computedStyle.backgroundImage === 'none' || 
-            tile.offsetHeight < 10 // Sanity check for rendering
-        ) {
-            useFallbackTileStyle(tile, index, row, col, gridSize);
-        }
-    }, 300);
-}
-
-// Apply fallback colored style for tiles when images fail
-function useFallbackTileStyle(tile, index, row, col, gridSize) {
-    const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
-    const colorIndex = (row * gridSize + col) % colors.length;
-    
-    // Remove background image and add color
-    tile.style.backgroundImage = 'none';
-    tile.style.backgroundColor = colors[colorIndex];
-    
-    // Add class and text for number
-    tile.classList.add('numbered');
-    tile.textContent = index + 1;
 }
 
 // Shuffle the tiles
@@ -555,27 +468,11 @@ function swapTiles(tile1, tile2) {
     [tile1.dataset.row, tile2.dataset.row] = [tile2.dataset.row, tile1.dataset.row];
     [tile1.dataset.col, tile2.dataset.col] = [tile2.dataset.col, tile1.dataset.col];
     
-    // Visual position swap
-    const tempStyle = {
-        top: tile1.style.top,
-        left: tile1.style.left,
-        order: tile1.style.order
-    };
-    
-    tile1.style.top = tile2.style.top;
-    tile1.style.left = tile2.style.left;
-    tile1.style.order = tile2.style.order;
-    
-    tile2.style.top = tempStyle.top;
-    tile2.style.left = tempStyle.left;
-    tile2.style.order = tempStyle.order;
-    
-    // Swap background position if not empty tile
-    if (!tile1.classList.contains('empty') && !tile2.classList.contains('empty')) {
-        const tempBg = tile1.style.backgroundPosition;
-        tile1.style.backgroundPosition = tile2.style.backgroundPosition;
-        tile2.style.backgroundPosition = tempBg;
-    }
+    // Add animation class for smooth movement
+    tile1.classList.add('moving');
+    setTimeout(() => {
+        tile1.classList.remove('moving');
+    }, 200);
 }
 
 // Check if the puzzle is solved
