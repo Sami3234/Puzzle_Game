@@ -11,6 +11,7 @@ let maxTime = 60; // Default 1 minute for level 1
 let imagesLoaded = false;
 
 // DOM Elements
+const loadingOverlay = document.getElementById('loading-overlay');
 const welcomeModal = document.getElementById('welcome-modal');
 const levelSelectPage = document.getElementById('level-select-page');
 const previewPage = document.getElementById('preview-page');
@@ -56,94 +57,126 @@ const levelGridSizes = [3, 3, 4, 4, 4, 5, 5, 5, 6, 6];
 
 // Initialize the game
 function init() {
+    // Show loading overlay
+    if (loadingOverlay) {
+        loadingOverlay.style.display = 'flex';
+    }
+    
     loadProgress();
     createLevelButtons();
-    showWelcomeModal();
-    setupEventListeners();
-    preloadImages();
+    preloadImages().then(() => {
+        // Hide loading overlay when preloading is complete
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                showWelcomeModal();
+            }, 500);
+        } else {
+            showWelcomeModal();
+        }
+        setupEventListeners();
+    }).catch(error => {
+        console.error('Error preloading images:', error);
+        // Still hide the overlay even if there was an error
+        if (loadingOverlay) {
+            loadingOverlay.style.opacity = '0';
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+                showWelcomeModal();
+            }, 500);
+        } else {
+            showWelcomeModal();
+        }
+        setupEventListeners();
+    });
 }
 
 // Preload all images to avoid loading issues
 function preloadImages() {
-    const loadingMessage = document.createElement('div');
-    loadingMessage.style.position = 'fixed';
-    loadingMessage.style.bottom = '10px';
-    loadingMessage.style.left = '10px';
-    loadingMessage.style.background = 'rgba(0,0,0,0.7)';
-    loadingMessage.style.color = 'white';
-    loadingMessage.style.padding = '5px 10px';
-    loadingMessage.style.borderRadius = '5px';
-    loadingMessage.style.zIndex = '9999';
-    loadingMessage.textContent = 'Loading images...';
-    document.body.appendChild(loadingMessage);
-
-    // Create an array to hold all images
-    const preloadedImages = [];
-    let loadedCount = 0;
-    
-    // Create a function to update loading status
-    const updateLoadingStatus = () => {
-        loadedCount++;
-        loadingMessage.textContent = `Loading images: ${loadedCount}/${levelImages.length}`;
+    return new Promise((resolve) => {
+        // Create an array to hold all images
+        const preloadedImages = [];
+        let loadedCount = 0;
+        const totalImages = levelImages.length;
         
-        if (loadedCount >= levelImages.length) {
-            loadingMessage.textContent = 'All images loaded!';
-            imagesLoaded = true;
-            
-            // Remove the message after 1 second
-            setTimeout(() => {
-                document.body.removeChild(loadingMessage);
-            }, 1000);
-        }
-    };
+        // Create a function to update loading status
+        const imageLoaded = () => {
+            loadedCount++;
+            if (loadedCount >= totalImages) {
+                imagesLoaded = true;
+                resolve();
+            }
+        };
 
-    // Preload all level images
-    levelImages.forEach((url, index) => {
-        const img = new Image();
-        img.onload = () => {
-            preloadedImages[index] = img;
-            updateLoadingStatus();
-        };
-        img.onerror = () => {
-            // If error, use fallback and continue
-            console.error(`Failed to load image: ${url}`);
-            const fallbackImg = new Image();
-            fallbackImg.src = fallbackImage;
-            preloadedImages[index] = fallbackImg;
-            updateLoadingStatus();
-            
-            // Replace the failed URL with fallback in the levelImages array
-            levelImages[index] = fallbackImage;
-        };
-        img.src = url;
+        // Preload all level images
+        levelImages.forEach((url, index) => {
+            const img = new Image();
+            img.onload = () => {
+                preloadedImages[index] = img;
+                imageLoaded();
+            };
+            img.onerror = () => {
+                // If error, use fallback and continue
+                console.error(`Failed to load image: ${url}`);
+                const fallbackImg = new Image();
+                fallbackImg.src = fallbackImage;
+                preloadedImages[index] = fallbackImg;
+                
+                // Replace the failed URL with fallback in the levelImages array
+                levelImages[index] = fallbackImage;
+                imageLoaded();
+            };
+            img.src = url;
+        });
+
+        // Also preload the fallback
+        const fallbackImg = new Image();
+        fallbackImg.src = fallbackImage;
+        
+        // If no images load within 5 seconds, resolve anyway
+        setTimeout(() => {
+            if (!imagesLoaded) {
+                console.warn('Image preloading timeout - continuing anyway');
+                resolve();
+            }
+        }, 5000);
     });
-
-    // Also preload the fallback
-    const fallbackImg = new Image();
-    fallbackImg.src = fallbackImage;
 }
 
 // Load game progress from localStorage
 function loadProgress() {
-    const savedProgress = localStorage.getItem('puzzleProgress');
-    if (savedProgress) {
-        const progress = JSON.parse(savedProgress);
-        unlockedLevels = progress.unlockedLevels || [1];
-        completedLevels = progress.completedLevels || [];
+    try {
+        const savedProgress = localStorage.getItem('puzzleProgress');
+        if (savedProgress) {
+            const progress = JSON.parse(savedProgress);
+            unlockedLevels = progress.unlockedLevels || [1];
+            completedLevels = progress.completedLevels || [];
+        }
+    } catch (error) {
+        console.error('Error loading progress:', error);
+        unlockedLevels = [1];
+        completedLevels = [];
     }
 }
 
 // Save game progress to localStorage
 function saveProgress() {
-    const progress = {
-        unlockedLevels,
-        completedLevels
-    };
-    localStorage.setItem('puzzleProgress', JSON.stringify(progress));
+    try {
+        const progress = {
+            unlockedLevels,
+            completedLevels
+        };
+        localStorage.setItem('puzzleProgress', JSON.stringify(progress));
+    } catch (error) {
+        console.error('Error saving progress:', error);
+    }
 }
 
 // Create level selection buttons
 function createLevelButtons() {
+    if (!levelsGrid) return;
+    
     levelsGrid.innerHTML = '';
     for (let i = 1; i <= 10; i++) {
         const button = document.createElement('button');
@@ -169,18 +202,20 @@ function createLevelButtons() {
 
 // Show welcome modal
 function showWelcomeModal() {
-    welcomeModal.classList.add('active');
+    if (welcomeModal) {
+        welcomeModal.classList.add('active');
+    }
 }
 
 // Setup event listeners
 function setupEventListeners() {
     // Welcome modal
-    document.getElementById('start-game').addEventListener('click', () => {
+    document.getElementById('start-game')?.addEventListener('click', () => {
         welcomeModal.classList.remove('active');
         showPage(levelSelectPage);
         
         // Start background music if enabled
-        if (isMusicOn) {
+        if (isMusicOn && backgroundMusic) {
             backgroundMusic.play().catch(error => {
                 console.log('Audio playback error:', error);
             });
@@ -188,7 +223,7 @@ function setupEventListeners() {
     });
 
     // Menu buttons
-    document.getElementById('menu-btn').addEventListener('click', () => {
+    document.getElementById('menu-btn')?.addEventListener('click', () => {
         menuModal.classList.add('active');
     });
     
@@ -227,35 +262,41 @@ function setupEventListeners() {
     });
 
     // Sound toggle
-    document.getElementById('sound-toggle').addEventListener('click', () => {
+    document.getElementById('sound-toggle')?.addEventListener('click', () => {
         isSoundOn = !isSoundOn;
-        document.getElementById('sound-toggle').textContent = isSoundOn ? 'Sound: ON' : 'Sound: OFF';
-        document.getElementById('sound-toggle').className = isSoundOn ? 'sound-on' : 'sound-off';
+        const soundToggle = document.getElementById('sound-toggle');
+        if (soundToggle) {
+            soundToggle.textContent = isSoundOn ? 'Sound: ON' : 'Sound: OFF';
+            soundToggle.className = isSoundOn ? 'sound-on' : 'sound-off';
+        }
     });
 
     // Music toggle
-    document.getElementById('music-toggle').addEventListener('click', () => {
+    document.getElementById('music-toggle')?.addEventListener('click', () => {
         isMusicOn = !isMusicOn;
-        document.getElementById('music-toggle').textContent = isMusicOn ? 'Music: ON' : 'Music: OFF';
-        document.getElementById('music-toggle').className = isMusicOn ? 'music-on' : 'music-off';
+        const musicToggle = document.getElementById('music-toggle');
+        if (musicToggle) {
+            musicToggle.textContent = isMusicOn ? 'Music: ON' : 'Music: OFF';
+            musicToggle.className = isMusicOn ? 'music-on' : 'music-off';
+        }
         
-        if (isMusicOn) {
+        if (isMusicOn && backgroundMusic) {
             backgroundMusic.play().catch(error => {
                 console.log('Audio playback error:', error);
             });
-        } else {
+        } else if (backgroundMusic) {
             backgroundMusic.pause();
         }
     });
 
     // Instructions button
-    document.getElementById('instructions-btn').addEventListener('click', () => {
+    document.getElementById('instructions-btn')?.addEventListener('click', () => {
         menuModal.classList.remove('active');
         instructionsModal.classList.add('active');
     });
 
     // Reset progress button
-    document.getElementById('reset-btn').addEventListener('click', () => {
+    document.getElementById('reset-btn')?.addEventListener('click', () => {
         if (confirm('Are you sure you want to reset all progress?')) {
             unlockedLevels = [1];
             completedLevels = [];
@@ -277,6 +318,8 @@ function setupEventListeners() {
 
 // Show a specific page
 function showPage(page) {
+    if (!page) return;
+    
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     page.classList.add('active');
 }
@@ -287,16 +330,24 @@ function selectLevel(level) {
     
     currentLevel = level;
     maxTime = levelTimes[level - 1];
-    showPage(previewPage);
+    
+    if (previewPage) {
+        showPage(previewPage);
+    }
     
     // Load level image with error handling
-    const imgUrl = levelImages[level - 1] || fallbackImage;
-    setBackgroundSafely(previewImage, imgUrl);
+    if (previewImage) {
+        const imgUrl = levelImages[level - 1] || fallbackImage;
+        setBackgroundSafely(previewImage, imgUrl);
+    }
 }
 
 // Safe way to set background images
 function setBackgroundSafely(element, url) {
     if (!element) return;
+    
+    // Set default background first
+    element.style.backgroundColor = '#e0e0e0';
     
     // Create a temporary image to check loading
     const tempImg = new Image();
@@ -315,6 +366,8 @@ function setBackgroundSafely(element, url) {
 
 // Start the game
 function startGame() {
+    if (!gamePage) return;
+    
     showPage(gamePage);
     moves = 0;
     time = 0;
@@ -325,6 +378,8 @@ function startGame() {
 
 // Create the puzzle
 function createPuzzle() {
+    if (!puzzleContainer) return;
+    
     puzzleContainer.innerHTML = '';
     const gridSize = levelGridSizes[currentLevel - 1];
     
@@ -359,6 +414,8 @@ function createPuzzle() {
 
 // Create a single tile
 function createTile(index, gridSize, tileSize, imageUrl) {
+    if (!puzzleContainer) return;
+    
     const tile = document.createElement('div');
     tile.className = 'tile';
     tile.style.width = `${tileSize}%`;
@@ -368,10 +425,17 @@ function createTile(index, gridSize, tileSize, imageUrl) {
     const row = Math.floor(index / gridSize);
     const col = index % gridSize;
     
-    // Set the background image directly with appropriate sizing and position
-    tile.style.backgroundImage = `url(${imageUrl})`;
-    tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
-    tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
+    // Try setting the background image directly
+    try {
+        // Set the background image directly with appropriate sizing and position
+        tile.style.backgroundImage = `url(${imageUrl})`;
+        tile.style.backgroundSize = `${gridSize * 100}% ${gridSize * 100}%`;
+        tile.style.backgroundPosition = `${col * (100/(gridSize-1))}% ${row * (100/(gridSize-1))}%`;
+    } catch (error) {
+        console.error('Error setting background image:', error);
+        // If error occurs, use fallback colored tiles
+        useFallbackTileStyle(tile, index, row, col, gridSize);
+    }
     
     // Add data attributes for position tracking
     tile.dataset.row = row;
@@ -380,31 +444,42 @@ function createTile(index, gridSize, tileSize, imageUrl) {
     tile.addEventListener('click', () => moveTile(tile));
     puzzleContainer.appendChild(tile);
     
-    // Handle load errors
-    const tempImg = new Image();
-    tempImg.onerror = () => {
-        // If image fails to load, use a colored background instead
-        const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
-        const colorIndex = (row * gridSize + col) % colors.length;
-        tile.style.backgroundImage = 'none';
-        tile.style.backgroundColor = colors[colorIndex];
-        
-        // Add text showing position
-        tile.textContent = index + 1;
-        tile.style.display = 'flex';
-        tile.style.justifyContent = 'center';
-        tile.style.alignItems = 'center';
-        tile.style.fontSize = '1.5rem';
-        tile.style.fontWeight = 'bold';
-        tile.style.color = 'white';
-    };
-    tempImg.src = imageUrl;
+    // Handle load errors - check if image load is successful after short timeout
+    setTimeout(() => {
+        // If image doesn't appear to be showing correctly (no background image or error loading)
+        const computedStyle = window.getComputedStyle(tile);
+        if (
+            !computedStyle.backgroundImage || 
+            computedStyle.backgroundImage === 'none' || 
+            tile.offsetHeight < 10 // Sanity check for rendering
+        ) {
+            useFallbackTileStyle(tile, index, row, col, gridSize);
+        }
+    }, 300);
+}
+
+// Apply fallback colored style for tiles when images fail
+function useFallbackTileStyle(tile, index, row, col, gridSize) {
+    const colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+    const colorIndex = (row * gridSize + col) % colors.length;
+    
+    // Remove background image and add color
+    tile.style.backgroundImage = 'none';
+    tile.style.backgroundColor = colors[colorIndex];
+    
+    // Add class and text for number
+    tile.classList.add('numbered');
+    tile.textContent = index + 1;
 }
 
 // Shuffle the tiles
 function shuffleTiles(gridSize) {
+    if (!puzzleContainer) return;
+    
     const tiles = Array.from(puzzleContainer.children);
-    const emptyTile = tiles[tiles.length - 1];
+    const emptyTile = tiles.find(tile => tile.classList.contains('empty'));
+    
+    if (!emptyTile) return;
     
     // Perform random moves to shuffle
     for (let i = 0; i < 100; i++) {
@@ -418,6 +493,8 @@ function shuffleTiles(gridSize) {
 
 // Get adjacent tiles to the empty tile
 function getAdjacentTiles(emptyTile, gridSize) {
+    if (!puzzleContainer) return [];
+    
     const tiles = Array.from(puzzleContainer.children);
     const emptyRow = parseInt(emptyTile.dataset.row);
     const emptyCol = parseInt(emptyTile.dataset.col);
@@ -438,6 +515,8 @@ function getAdjacentTiles(emptyTile, gridSize) {
 
 // Move a tile
 function moveTile(tile) {
+    if (!puzzleContainer) return;
+    
     const tiles = Array.from(puzzleContainer.children);
     const emptyTile = tiles.find(t => t.classList.contains('empty'));
     
@@ -476,10 +555,20 @@ function swapTiles(tile1, tile2) {
     [tile1.dataset.row, tile2.dataset.row] = [tile2.dataset.row, tile1.dataset.row];
     [tile1.dataset.col, tile2.dataset.col] = [tile2.dataset.col, tile1.dataset.col];
     
-    // Swap position in the grid
-    const tempPos = tile1.style.order;
+    // Visual position swap
+    const tempStyle = {
+        top: tile1.style.top,
+        left: tile1.style.left,
+        order: tile1.style.order
+    };
+    
+    tile1.style.top = tile2.style.top;
+    tile1.style.left = tile2.style.left;
     tile1.style.order = tile2.style.order;
-    tile2.style.order = tempPos;
+    
+    tile2.style.top = tempStyle.top;
+    tile2.style.left = tempStyle.left;
+    tile2.style.order = tempStyle.order;
     
     // Swap background position if not empty tile
     if (!tile1.classList.contains('empty') && !tile2.classList.contains('empty')) {
@@ -491,6 +580,8 @@ function swapTiles(tile1, tile2) {
 
 // Check if the puzzle is solved
 function checkWin() {
+    if (!puzzleContainer) return false;
+    
     const tiles = Array.from(puzzleContainer.children);
     const gridSize = levelGridSizes[currentLevel - 1];
     
@@ -530,10 +621,17 @@ function winGame() {
         saveProgress();
     }
     
-    winModal.classList.add('active');
-    document.getElementById('win-level').textContent = currentLevel;
-    document.getElementById('win-moves').textContent = moves;
-    document.getElementById('win-time').textContent = formatTime(time);
+    if (winModal) {
+        winModal.classList.add('active');
+        
+        const winLevel = document.getElementById('win-level');
+        const winMoves = document.getElementById('win-moves');
+        const winTime = document.getElementById('win-time');
+        
+        if (winLevel) winLevel.textContent = currentLevel;
+        if (winMoves) winMoves.textContent = moves;
+        if (winTime) winTime.textContent = formatTime(time);
+    }
 }
 
 // Start the timer
@@ -547,8 +645,10 @@ function startTimer() {
         // Check if time limit is reached
         if (time >= maxTime) {
             clearInterval(timer);
-            messageDisplay.textContent = "Time's up! Try again.";
-            messageDisplay.style.color = "red";
+            if (messageDisplay) {
+                messageDisplay.textContent = "Time's up! Try again.";
+                messageDisplay.style.color = "red";
+            }
         }
         
         updateDisplay();

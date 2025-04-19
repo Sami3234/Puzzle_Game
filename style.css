@@ -24,6 +24,37 @@ body {
     overflow: hidden;
 }
 
+/* Loading Overlay */
+#loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loader {
+    width: 60px;
+    height: 60px;
+    border: 8px solid #f3f3f3;
+    border-top: 8px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Page Styles */
 .page {
     display: none;
@@ -225,15 +256,21 @@ button {
     background: rgba(255, 255, 255, 0.7);
     border-radius: 1rem;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    position: relative; /* Added for positioning tiles */
 }
 
 .tile {
+    position: relative; /* Added for better positioning */
     background-size: 300% 300%;
     background-position: 0% 0%;
     border-radius: 0.5rem;
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* Ensure tiles are rendered correctly */
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    overflow: hidden;
 }
 
 .tile:hover {
@@ -246,6 +283,17 @@ button {
     background: rgba(255, 255, 255, 0.2);
     border: 2px dashed rgba(0, 0, 0, 0.1);
     box-shadow: none;
+}
+
+/* Add numbered tiles for fallback */
+.tile.numbered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .game-info {

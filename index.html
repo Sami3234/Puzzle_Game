@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sliding Puzzle Game</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Add preloading for critical images -->
+    <link rel="preload" href="https://i.imgur.com/kCpL5D3.jpg" as="image">
+    <link rel="preload" href="https://i.imgur.com/ZUe4GKj.jpg" as="image">
 </head>
 <body>
+    <!-- Loading Overlay -->
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <p>Loading game assets...</p>
+    </div>
+
     <!-- Welcome Popup -->
     <div id="welcome-modal" class="modal">
         <div class="modal-content">
@@ -88,10 +97,17 @@
         </div>
     </div>
 
+    <!-- Fallback Message -->
+    <noscript>
+        <div style="padding: 20px; background: #f44336; color: white; text-align: center;">
+            This game requires JavaScript to run. Please enable JavaScript in your browser settings.
+        </div>
+    </noscript>
+
     <!-- Audio Elements -->
-    <audio id="move-sound" src="sounds/move.mp3"></audio>
-    <audio id="win-sound" src="sounds/win.mp3"></audio>
-    <audio id="background-music" src="sounds/background.mp3" loop></audio>
+    <audio id="move-sound" src="https://cdn.freesound.org/previews/240/240776_4107740-lq.mp3"></audio>
+    <audio id="win-sound" src="https://cdn.freesound.org/previews/270/270402_5123851-lq.mp3"></audio>
+    <audio id="background-music" src="https://cdn.freesound.org/previews/511/511089_8156257-lq.mp3" loop></audio>
 
     <script src="script.js"></script>
 </body>
