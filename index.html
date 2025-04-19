@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Welcome Popup -->
+    <div id="welcome-modal" class="modal">
+        <div class="modal-content">
+            <h1>Welcome to Sliding Puzzle!</h1>
+            <p>Test your skills by solving these challenging puzzles.</p>
+            <button id="start-game" class="btn-primary">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Level Selection Page -->
+    <div id="level-select-page" class="page">
+        <header>
+            <h1>Select Level</h1>
+            <button id="menu-btn" class="menu-btn">☰</button>
+        </header>
+        <div id="levels-grid" class="levels"></div>
+    </div>
+
+    <!-- Preview Page -->
+    <div id="preview-page" class="page">
+        <header>
+            <button id="back-to-levels" class="btn-secondary">← Back</button>
+            <h1>Preview</h1>
+        </header>
+        <div id="preview-container">
+            <div id="preview-image"></div>
+            <button id="start-puzzle" class="btn-primary">Start Puzzle</button>
+        </div>
+    </div>
+
+    <!-- Game Page -->
+    <div id="game-page" class="page">
+        <header>
+            <button id="back-to-preview" class="btn-secondary">← Back</button>
+            <div class="game-info">
+                <span id="timer">00:00</span>
+                <span id="moves">0</span>
+                <span id="level">1</span>
+            </div>
+            <button id="game-menu-btn" class="menu-btn">☰</button>
+        </header>
+        <div id="puzzle-container"></div>
+        <div id="message"></div>
+    </div>
+
+    <!-- Menu Modal -->
+    <div id="menu-modal" class="modal">
+        <div class="modal-content">
+            <h2>Menu</h2>
+            <button id="sound-toggle" class="sound-on">Sound: ON</button>
+            <button id="music-toggle" class="music-on">Music: ON</button>
+            <button id="instructions-btn">Instructions</button>
+            <button id="reset-btn">Reset Progress</button>
+            <button class="close-modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Instructions Modal -->
+    <div id="instructions-modal" class="modal">
+        <div class="modal-content">
+            <h2>How to Play</h2>
+            <p>1. Click on a tile adjacent to the empty space to move it.</p>
+            <p>2. Arrange all tiles to complete the image.</p>
+            <p>3. Complete the puzzle within the time limit.</p>
+            <p>4. Each level increases in difficulty with more tiles.</p>
+            <button class="close-modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Win Modal -->
+    <div id="win-modal" class="modal">
+        <div class="modal-content">
+            <h2>Level Complete!</h2>
+            <p>Level: <span id="win-level">1</span></p>
+            <p>Moves: <span id="win-moves">0</span></p>
+            <p>Time: <span id="win-time">00:00</span></p>
+            <button id="next-level" class="btn-primary">Next Level</button>
+            <button id="back-to-levels-win" class="btn-secondary">Level Selection</button>
+        </div>
+    </div>
+
+    <!-- Audio Elements -->
+    <audio id="move-sound" src="sounds/move.mp3"></audio>
+    <audio id="win-sound" src="sounds/win.mp3"></audio>
+    <audio id="background-music" src="sounds/background.mp3" loop></audio>
+
+    <script src="script.js"></script>
+</body>
+</html> 
