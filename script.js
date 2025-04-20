@@ -16,13 +16,14 @@ let score = 0;
 let level = 1;
 let speed = 200;
 let obstacles = [];
+let foodBlinkCounter = 0;
+const foodBlinkInterval = 10; // Adjust this value to control blinking speed
 
 // Game settings
 const box = 20;
 const canvasSize = 400;
 const maxLevel = 5;
-const snakeColors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'];
-let foodBlink = true;
+const snakeColors = ['#ff6b6b', '#f0e130', '#6bffb3', '#6b6bff', '#ff6bff'];
 
 // Start the game
 startGameButton.addEventListener('click', () => {
@@ -37,20 +38,30 @@ function draw() {
 
     // Draw the snake
     snake.forEach((part, index) => {
-        ctx.fillStyle = snakeColors[index % snakeColors.length];
-        ctx.beginPath();
-        ctx.arc(part.x + box / 2, part.y + box / 2, box / 2, 0, Math.PI * 2);
-        ctx.fill();
+        if (index === 0) { // Head of the snake
+            ctx.fillStyle = '#ff6b6b'; // Vibrant color for the head
+            ctx.beginPath();
+            ctx.moveTo(part.x + box / 2, part.y); // Top point of the triangle
+            ctx.lineTo(part.x, part.y + box); // Bottom left
+            ctx.lineTo(part.x + box, part.y + box); // Bottom right
+            ctx.closePath();
+            ctx.fill();
+        } else { // Body of the snake
+            ctx.fillStyle = snakeColors[index % snakeColors.length];
+            ctx.beginPath();
+            ctx.arc(part.x + box / 2, part.y + box / 2, box / 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
     });
 
     // Draw the food
-    if (foodBlink) {
+    if (foodBlinkCounter % foodBlinkInterval < foodBlinkInterval / 2) {
         ctx.fillStyle = 'yellow';
         ctx.beginPath();
         ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
         ctx.fill();
     }
-    foodBlink = !foodBlink;
+    foodBlinkCounter++;
 
     // Draw the obstacles
     obstacles.forEach(obstacle => {
@@ -105,7 +116,10 @@ startNextLevelButton.addEventListener('click', () => {
 
 // Adjust speed based on slider
 speedControl.addEventListener('input', (event) => {
-    speed = parseInt(event.target.value);
+    const minSpeed = 20; // Minimum speed
+    const maxSpeed = 200; // Maximum speed
+    const sliderValue = parseInt(event.target.value);
+    speed = maxSpeed - ((sliderValue / 100) * (maxSpeed - minSpeed));
     clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
 });

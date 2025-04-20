@@ -5,15 +5,18 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
-    background: linear-gradient(135deg, #2c3e50, #4ca1af);
+    background: linear-gradient(135deg, #ff6b6b, #f0e130, #6bffb3, #6b6bff, #ff6bff);
+    background-size: 400% 400%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #ecf0f1;
-    animation: backgroundAnimation 10s ease infinite;
+    animation: backgroundAnimation 15s ease infinite;
 }
 
 @keyframes backgroundAnimation {
     0% { background-position: 0% 50%; }
+    25% { background-position: 50% 50%; }
     50% { background-position: 100% 50%; }
+    75% { background-position: 50% 50%; }
     100% { background-position: 0% 50%; }
 }
 
@@ -39,8 +42,11 @@ canvas {
     font-size: 1.5rem;
     color: #ecf0f1;
     z-index: 10;
-    background: none;
-    padding: 0;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    margin-bottom: 10px;
 }
 
 #gameCanvas {
@@ -107,7 +113,7 @@ canvas {
     width: 80%;
     background-color: #34495e;
     border-radius: 5px;
-    margin: 10px 0;
+    margin: 20px 0;
     overflow: hidden;
 }
 
@@ -174,6 +180,10 @@ canvas {
     align-items: center;
     justify-content: center;
     color: #ecf0f1;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 #speed-control label {
@@ -186,4 +196,5 @@ canvas {
     -webkit-appearance: slider-vertical;
     width: 8px;
     height: 150px;
+    margin: 10px 0;
 } 
