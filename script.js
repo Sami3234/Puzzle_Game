@@ -7,6 +7,8 @@ let snake = [{ x: 200, y: 200 }];
 let direction = { x: 0, y: 0 };
 let food = { x: 100, y: 100 };
 let score = 0;
+let level = 1;
+let speed = 200;
 
 // Game settings
 const box = 20;
@@ -34,8 +36,14 @@ function draw() {
     // Check for collision with food
     if (head.x === food.x && head.y === food.y) {
         score++;
-        scoreDisplay.textContent = 'Score: ' + score;
+        scoreDisplay.textContent = 'Score: ' + score + ' | Level: ' + level;
         placeFood();
+        if (score % 5 === 0) {
+            level++;
+            speed = Math.max(50, speed - 20);
+            clearInterval(gameLoop);
+            gameLoop = setInterval(draw, speed);
+        }
     } else {
         snake.pop();
     }
@@ -57,8 +65,12 @@ function resetGame() {
     snake = [{ x: 200, y: 200 }];
     direction = { x: 0, y: 0 };
     score = 0;
-    scoreDisplay.textContent = 'Score: ' + score;
+    level = 1;
+    speed = 200;
+    scoreDisplay.textContent = 'Score: ' + score + ' | Level: ' + level;
     placeFood();
+    clearInterval(gameLoop);
+    gameLoop = setInterval(draw, speed);
 }
 
 // Change direction based on key press
@@ -86,7 +98,7 @@ leftButton.addEventListener('click', () => changeDirection('ArrowLeft'));
 rightButton.addEventListener('click', () => changeDirection('ArrowRight'));
 
 // Start the game loop
-setInterval(draw, 100);
+let gameLoop = setInterval(draw, speed);
 
 // Initialize the game
 placeFood(); 
