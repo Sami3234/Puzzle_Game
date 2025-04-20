@@ -9,7 +9,16 @@
 <body>
     <h1>Snake Game</h1>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div id="score">Score: 0</div>
+    <div id="score">Score: 0 | Level: 1</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="level-popup" class="modal">
+        <div class="modal-content">
+            <p>Get ready for the next level!</p>
+            <button id="start-next-level">Start</button>
+        </div>
+    </div>
     <div class="controls">
         <button class="control-button" id="up">&#9650;</button>
         <div>

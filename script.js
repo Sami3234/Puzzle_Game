@@ -1,6 +1,9 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 const scoreDisplay = document.getElementById('score');
+const progressBar = document.getElementById('progress-bar');
+const levelPopup = document.getElementById('level-popup');
+const startNextLevelButton = document.getElementById('start-next-level');
 
 // Game variables
 let snake = [{ x: 200, y: 200 }];
@@ -9,10 +12,12 @@ let food = { x: 100, y: 100 };
 let score = 0;
 let level = 1;
 let speed = 200;
+let obstacles = [];
 
 // Game settings
 const box = 20;
 const canvasSize = 400;
+const maxLevel = 5;
 
 // Draw the game
 function draw() {
@@ -22,12 +27,20 @@ function draw() {
     // Draw the snake
     snake.forEach(part => {
         ctx.fillStyle = 'green';
-        ctx.fillRect(part.x, part.y, box, box);
+        ctx.beginPath();
+        ctx.arc(part.x + box / 2, part.y + box / 2, box / 2, 0, Math.PI * 2);
+        ctx.fill();
     });
 
     // Draw the food
     ctx.fillStyle = 'red';
     ctx.fillRect(food.x, food.y, box, box);
+
+    // Draw the obstacles
+    obstacles.forEach(obstacle => {
+        ctx.fillStyle = 'gray';
+        ctx.fillRect(obstacle.x, obstacle.y, box, box);
+    });
 
     // Move the snake
     const head = { x: snake[0].x + direction.x * box, y: snake[0].y + direction.y * box };
@@ -37,27 +50,62 @@ function draw() {
     if (head.x === food.x && head.y === food.y) {
         score++;
         scoreDisplay.textContent = 'Score: ' + score + ' | Level: ' + level;
+        updateProgressBar();
         placeFood();
-        if (score % 5 === 0) {
+        if (score % 20 === 0 && level < maxLevel) {
             level++;
             speed = Math.max(50, speed - 20);
+            snake = [{ x: 200, y: 200 }]; // Reset snake size
+            placeObstacles();
             clearInterval(gameLoop);
-            gameLoop = setInterval(draw, speed);
+            showLevelPopup();
         }
     } else {
         snake.pop();
     }
 
-    // Check for collision with walls or itself
-    if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snake.slice(1).some(part => part.x === head.x && part.y === head.y)) {
+    // Check for collision with walls, itself, or obstacles
+    if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snake.slice(1).some(part => part.x === head.x && part.y === head.y) || obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)) {
         resetGame();
     }
 }
+
+// Update the progress bar
+function updateProgressBar() {
+    const progress = (score % 20) / 20 * 100;
+    progressBar.style.width = progress + '%';
+}
+
+// Show level popup
+function showLevelPopup() {
+    levelPopup.classList.add('active');
+}
+
+// Start the next level
+startNextLevelButton.addEventListener('click', () => {
+    levelPopup.classList.remove('active');
+    gameLoop = setInterval(draw, speed);
+});
 
 // Place food at a random position
 function placeFood() {
     food.x = Math.floor(Math.random() * (canvasSize / box)) * box;
     food.y = Math.floor(Math.random() * (canvasSize / box)) * box;
+}
+
+// Place obstacles at random positions
+function placeObstacles() {
+    obstacles = [];
+    for (let i = 0; i < level; i++) {
+        const obstacle = {
+            x: Math.floor(Math.random() * (canvasSize / box)) * box,
+            y: Math.floor(Math.random() * (canvasSize / box)) * box
+        };
+        // Ensure obstacles do not overlap with the snake or food
+        if (!snake.some(part => part.x === obstacle.x && part.y === obstacle.y) && (obstacle.x !== food.x || obstacle.y !== food.y)) {
+            obstacles.push(obstacle);
+        }
+    }
 }
 
 // Reset the game
@@ -68,7 +116,9 @@ function resetGame() {
     level = 1;
     speed = 200;
     scoreDisplay.textContent = 'Score: ' + score + ' | Level: ' + level;
+    progressBar.style.width = '0%';
     placeFood();
+    placeObstacles();
     clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
 }
@@ -101,4 +151,5 @@ rightButton.addEventListener('click', () => changeDirection('ArrowRight'));
 let gameLoop = setInterval(draw, speed);
 
 // Initialize the game
-placeFood(); 
+placeFood();
+placeObstacles(); 
