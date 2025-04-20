@@ -21,6 +21,8 @@ let obstacles = [];
 const box = 20;
 const canvasSize = 400;
 const maxLevel = 5;
+const snakeColors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'];
+let foodBlink = true;
 
 // Start the game
 startGameButton.addEventListener('click', () => {
@@ -34,20 +36,25 @@ function draw() {
     ctx.clearRect(0, 0, canvasSize, canvasSize);
 
     // Draw the snake
-    snake.forEach(part => {
-        ctx.fillStyle = 'green';
+    snake.forEach((part, index) => {
+        ctx.fillStyle = snakeColors[index % snakeColors.length];
         ctx.beginPath();
         ctx.arc(part.x + box / 2, part.y + box / 2, box / 2, 0, Math.PI * 2);
         ctx.fill();
     });
 
     // Draw the food
-    ctx.fillStyle = 'red';
-    ctx.fillRect(food.x, food.y, box, box);
+    if (foodBlink) {
+        ctx.fillStyle = 'yellow';
+        ctx.beginPath();
+        ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    foodBlink = !foodBlink;
 
     // Draw the obstacles
     obstacles.forEach(obstacle => {
-        ctx.fillStyle = 'gray';
+        ctx.fillStyle = 'red';
         ctx.fillRect(obstacle.x, obstacle.y, box, box);
     });
 
@@ -112,7 +119,7 @@ function placeFood() {
 // Place obstacles at random positions
 function placeObstacles() {
     obstacles = [];
-    for (let i = 0; i < level; i++) {
+    for (let i = 0; i < level + 2; i++) { // Increase obstacles with each level
         const obstacle = {
             x: Math.floor(Math.random() * (canvasSize / box)) * box,
             y: Math.floor(Math.random() * (canvasSize / box)) * box

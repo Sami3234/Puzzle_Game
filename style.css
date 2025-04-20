@@ -32,13 +32,15 @@ canvas {
 }
 
 #score {
-    position: absolute;
+    position: fixed;
     top: 10px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.5rem;
     color: #ecf0f1;
     z-index: 10;
+    background: none;
+    padding: 0;
 }
 
 #gameCanvas {
@@ -73,13 +75,13 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 
 .control-row {
     display: flex;
     justify-content: center;
-    margin: 5px 0;
+    margin: 2px 0;
 }
 
 .control-button {
@@ -163,18 +165,25 @@ canvas {
 }
 
 #speed-control {
-    margin: 10px 0;
+    position: fixed;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    color: #f0f0f0;
+    color: #ecf0f1;
 }
 
 #speed-control label {
-    margin-right: 10px;
+    margin-bottom: 10px;
     font-size: 1.2rem;
 }
 
 #speed-control input[type="range"] {
-    width: 150px;
+    writing-mode: bt-lr; /* Vertical slider */
+    -webkit-appearance: slider-vertical;
+    width: 8px;
+    height: 150px;
 } 
