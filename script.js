@@ -1,5 +1,6 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
+const scoreDisplay = document.getElementById('score');
 
 // Game variables
 let snake = [{ x: 200, y: 200 }];
@@ -33,6 +34,7 @@ function draw() {
     // Check for collision with food
     if (head.x === food.x && head.y === food.y) {
         score++;
+        scoreDisplay.textContent = 'Score: ' + score;
         placeFood();
     } else {
         snake.pop();
@@ -42,11 +44,6 @@ function draw() {
     if (head.x < 0 || head.x >= canvasSize || head.y < 0 || head.y >= canvasSize || snake.slice(1).some(part => part.x === head.x && part.y === head.y)) {
         resetGame();
     }
-
-    // Display the score
-    ctx.fillStyle = 'black';
-    ctx.font = '20px Arial';
-    ctx.fillText('Score: ' + score, 10, canvasSize - 10);
 }
 
 // Place food at a random position
@@ -60,17 +57,33 @@ function resetGame() {
     snake = [{ x: 200, y: 200 }];
     direction = { x: 0, y: 0 };
     score = 0;
+    scoreDisplay.textContent = 'Score: ' + score;
     placeFood();
 }
 
 // Change direction based on key press
 window.addEventListener('keydown', event => {
-    const { key } = event;
+    changeDirection(event.key);
+});
+
+// Change direction based on button press
+function changeDirection(key) {
     if (key === 'ArrowUp' && direction.y === 0) direction = { x: 0, y: -1 };
     if (key === 'ArrowDown' && direction.y === 0) direction = { x: 0, y: 1 };
     if (key === 'ArrowLeft' && direction.x === 0) direction = { x: -1, y: 0 };
     if (key === 'ArrowRight' && direction.x === 0) direction = { x: 1, y: 0 };
-});
+}
+
+// Add event listeners for mobile controls
+const upButton = document.getElementById('up');
+const downButton = document.getElementById('down');
+const leftButton = document.getElementById('left');
+const rightButton = document.getElementById('right');
+
+upButton.addEventListener('click', () => changeDirection('ArrowUp'));
+downButton.addEventListener('click', () => changeDirection('ArrowDown'));
+leftButton.addEventListener('click', () => changeDirection('ArrowLeft'));
+rightButton.addEventListener('click', () => changeDirection('ArrowRight'));
 
 // Start the game loop
 setInterval(draw, 100);
