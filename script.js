@@ -117,10 +117,10 @@ startNextLevelButton.addEventListener('click', () => {
 
 // Adjust speed based on slider
 speedControl.addEventListener('input', (event) => {
-    const minSpeed = 20; // Minimum speed
-    const maxSpeed = 200; // Maximum speed
+    const minSpeed = 200; // Minimum speed (slowest)
+    const maxSpeed = 50; // Maximum speed (fastest)
     const sliderValue = parseInt(event.target.value);
-    speed = maxSpeed - ((sliderValue / 100) * (maxSpeed - minSpeed));
+    speed = minSpeed - ((sliderValue / 100) * (minSpeed - maxSpeed));
     clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
 });
