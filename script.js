@@ -55,13 +55,14 @@ function draw() {
     });
 
     // Draw the food
-    if (foodBlinkCounter % foodBlinkInterval < foodBlinkInterval / 2) {
-        ctx.fillStyle = 'yellow';
-        ctx.beginPath();
-        ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
-        ctx.fill();
-    }
-    foodBlinkCounter++;
+    ctx.fillStyle = 'yellow';
+    ctx.beginPath();
+    ctx.arc(food.x + box / 2, food.y + box / 2, box / 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'orange';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.lineWidth = 1;
 
     // Draw the obstacles
     obstacles.forEach(obstacle => {

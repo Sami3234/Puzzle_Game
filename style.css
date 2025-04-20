@@ -35,8 +35,8 @@ canvas {
 }
 
 #score {
-    position: fixed;
-    top: 10px;
+    position: absolute;
+    top: 5px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.5rem;
@@ -171,9 +171,9 @@ canvas {
 }
 
 #speed-control {
-    position: fixed;
+    position: absolute;
     top: 50%;
-    left: 10px;
+    left: 20px;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
