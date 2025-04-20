@@ -7,11 +7,18 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Snake Game</h1>
+    <div id="start-screen">
+        <h1>Snake Game</h1>
+        <button id="start-game">Start Game</button>
+    </div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
     <div id="score">Score: 0 | Level: 1</div>
     <div id="progress-container">
         <div id="progress-bar"></div>
+    </div>
+    <div id="speed-control">
+        <label for="speed">Speed:</label>
+        <input type="range" id="speed" name="speed" min="50" max="300" value="200" step="10">
     </div>
     <div id="level-popup" class="modal">
         <div class="modal-content">
@@ -20,12 +27,14 @@
         </div>
     </div>
     <div class="controls">
-        <button class="control-button" id="up">&#9650;</button>
-        <div>
+        <div class="control-row">
+            <button class="control-button" id="up">&#9650;</button>
+        </div>
+        <div class="control-row">
             <button class="control-button" id="left">&#9664;</button>
+            <button class="control-button" id="down">&#9660;</button>
             <button class="control-button" id="right">&#9654;</button>
         </div>
-        <button class="control-button" id="down">&#9660;</button>
     </div>
     <script src="script.js"></script>
 </body>

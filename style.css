@@ -5,9 +5,9 @@ body {
     justify-content: center;
     height: 100vh;
     margin: 0;
-    background: linear-gradient(135deg, #6a0572, #0f9b0f, #fdbb2d);
+    background: linear-gradient(135deg, #2c3e50, #4ca1af);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #f0f0f0;
+    color: #ecf0f1;
     animation: backgroundAnimation 10s ease infinite;
 }
 
@@ -25,45 +25,85 @@ h1 {
 }
 
 canvas {
-    border: 2px solid #f0f0f0;
+    border: 2px solid #ecf0f1;
     background-color: rgba(0, 0, 0, 0.5);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    margin-top: 50px;
 }
 
 #score {
-    margin-top: 20px;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: 1.5rem;
-    color: #f0f0f0;
+    color: #ecf0f1;
+    z-index: 10;
+}
+
+#gameCanvas {
+    margin-top: 50px;
+}
+
+#start-screen {
+    display: none;
+}
+
+#start-screen h1 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+}
+
+#start-screen button {
+    padding: 10px 20px;
+    font-size: 1.5rem;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#start-screen button:hover {
+    background-color: #45a049;
 }
 
 .controls {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     margin-top: 20px;
+}
+
+.control-row {
+    display: flex;
+    justify-content: center;
+    margin: 5px 0;
 }
 
 .control-button {
     width: 50px;
     height: 50px;
     margin: 5px;
-    background-color: #f0f0f0;
+    background-color: #3498db;
     border: none;
     border-radius: 50%;
     font-size: 1.5rem;
-    color: #1e1e1e;
+    color: white;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .control-button:hover {
-    background-color: #d0d0d0;
+    background-color: #2980b9;
     transform: scale(1.1);
 }
 
 #progress-container {
     width: 80%;
-    background-color: #ddd;
+    background-color: #34495e;
     border-radius: 5px;
     margin: 10px 0;
     overflow: hidden;
@@ -72,7 +112,7 @@ canvas {
 #progress-bar {
     height: 20px;
     width: 0%;
-    background-color: #4caf50;
+    background-color: #1abc9c;
     transition: width 0.3s ease;
 }
 
@@ -90,11 +130,17 @@ canvas {
 }
 
 .modal-content {
-    background: #fff;
+    background: linear-gradient(135deg, #34495e, #2c3e50);
     padding: 20px;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #ecf0f1;
+}
+
+.modal-content p {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
 }
 
 .modal.active {
@@ -104,7 +150,7 @@ canvas {
 #start-next-level {
     margin-top: 10px;
     padding: 10px 20px;
-    background-color: #4caf50;
+    background-color: #1abc9c;
     color: white;
     border: none;
     border-radius: 5px;
@@ -113,5 +159,22 @@ canvas {
 }
 
 #start-next-level:hover {
-    background-color: #45a049;
+    background-color: #16a085;
+}
+
+#speed-control {
+    margin: 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f0f0f0;
+}
+
+#speed-control label {
+    margin-right: 10px;
+    font-size: 1.2rem;
+}
+
+#speed-control input[type="range"] {
+    width: 150px;
 } 

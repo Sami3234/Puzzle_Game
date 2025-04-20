@@ -4,6 +4,9 @@ const scoreDisplay = document.getElementById('score');
 const progressBar = document.getElementById('progress-bar');
 const levelPopup = document.getElementById('level-popup');
 const startNextLevelButton = document.getElementById('start-next-level');
+const speedControl = document.getElementById('speed');
+const startScreen = document.getElementById('start-screen');
+const startGameButton = document.getElementById('start-game');
 
 // Game variables
 let snake = [{ x: 200, y: 200 }];
@@ -18,6 +21,12 @@ let obstacles = [];
 const box = 20;
 const canvasSize = 400;
 const maxLevel = 5;
+
+// Start the game
+startGameButton.addEventListener('click', () => {
+    startScreen.style.display = 'none';
+    gameLoop = setInterval(draw, speed);
+});
 
 // Draw the game
 function draw() {
@@ -84,6 +93,13 @@ function showLevelPopup() {
 // Start the next level
 startNextLevelButton.addEventListener('click', () => {
     levelPopup.classList.remove('active');
+    gameLoop = setInterval(draw, speed);
+});
+
+// Adjust speed based on slider
+speedControl.addEventListener('input', (event) => {
+    speed = parseInt(event.target.value);
+    clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
 });
 
