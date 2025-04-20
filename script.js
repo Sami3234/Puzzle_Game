@@ -115,14 +115,40 @@ startNextLevelButton.addEventListener('click', () => {
     gameLoop = setInterval(draw, speed);
 });
 
-// Adjust speed based on slider
+// Add a percentage display for the speed control
+const speedPercentage = document.createElement('div');
+speedPercentage.className = 'percentage';
+speedControl.appendChild(speedPercentage);
+
+// Update the percentage display and speed based on slider
 speedControl.addEventListener('input', (event) => {
     const minSpeed = 200; // Minimum speed (slowest)
     const maxSpeed = 50; // Maximum speed (fastest)
     const sliderValue = parseInt(event.target.value);
     speed = minSpeed - ((sliderValue / 100) * (minSpeed - maxSpeed));
+    speedPercentage.textContent = sliderValue + '%';
     clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
+});
+
+// Add a checkbox for toggling speed control
+const speedToggle = document.createElement('input');
+speedToggle.type = 'checkbox';
+speedToggle.id = 'speed-toggle';
+speedToggle.checked = true;
+speedControl.appendChild(speedToggle);
+
+const speedToggleLabel = document.createElement('label');
+speedToggleLabel.htmlFor = 'speed-toggle';
+speedToggleLabel.textContent = 'Speed Control';
+speedControl.appendChild(speedToggleLabel);
+
+speedToggle.addEventListener('change', () => {
+    if (speedToggle.checked) {
+        gameLoop = setInterval(draw, speed);
+    } else {
+        clearInterval(gameLoop);
+    }
 });
 
 // Place food at a random position

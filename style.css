@@ -36,7 +36,7 @@ canvas {
 
 #score {
     position: absolute;
-    top: -40px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
     font-size: 1.5rem;
@@ -173,7 +173,7 @@ canvas {
 #speed-control {
     position: absolute;
     top: 50%;
-    left: -60px;
+    left: -80px;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
@@ -189,6 +189,7 @@ canvas {
 #speed-control label {
     margin-bottom: 10px;
     font-size: 1.2rem;
+    color: #ecf0f1;
 }
 
 #speed-control input[type="range"] {
@@ -197,4 +198,10 @@ canvas {
     width: 8px;
     height: 150px;
     margin: 10px 0;
+}
+
+#speed-control .percentage {
+    font-size: 1rem;
+    color: #ecf0f1;
+    margin-top: 5px;
 } 
