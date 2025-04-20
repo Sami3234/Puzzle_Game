@@ -3,32 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T3 Goti Game</title>
+    <title>Snake Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1>T3 Goti Game</h1>
-        <div id="game-info">
-            <span id="player-turn">Player 1's Turn</span>
-            <span id="score">Player 1: 0 | Player 2: 0</span>
-        </div>
-    </header>
-    <main>
-        <div id="game-board" class="board">
-            <!-- 3x3 grid for the game -->
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
-        </div>
-        <button id="reset-button">Reset Game</button>
-    </main>
+    <h1>Snake Game</h1>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
     <script src="script.js"></script>
 </body>
 </html> 
