@@ -10,7 +10,7 @@ const startGameButton = document.getElementById('start-game');
 
 // Game variables
 let snake = [{ x: 200, y: 200 }];
-let direction = { x: 0, y: 0 };
+let direction = { x: 1, y: 0 };
 let food = { x: 100, y: 100 };
 let score = 0;
 let level = 1;
@@ -18,6 +18,7 @@ let speed = 200;
 let obstacles = [];
 let foodBlinkCounter = 0;
 const foodBlinkInterval = 10; // Adjust this value to control blinking speed
+let gameLoop = null; // Initialize gameLoop as null
 
 // Game settings
 const box = 20;
@@ -25,11 +26,15 @@ const canvasSize = 400;
 const maxLevel = 5;
 const snakeColors = ['#ff6b6b', '#f0e130', '#6bffb3', '#6b6bff', '#ff6bff'];
 
-// Start the game
+// Start the game only after clicking the start button
 startGameButton.addEventListener('click', () => {
     startScreen.style.display = 'none';
+    if (gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(draw, speed);
 });
+
+// Ensure the game doesn't start automatically
+clearInterval(gameLoop);
 
 // Draw the game
 function draw() {
@@ -175,7 +180,7 @@ function placeObstacles() {
 // Reset the game
 function resetGame() {
     snake = [{ x: 200, y: 200 }];
-    direction = { x: 0, y: 0 };
+    direction = { x: 1, y: 0 };
     score = 0;
     level = 1;
     speed = 200;
@@ -189,31 +194,57 @@ function resetGame() {
 
 // Change direction based on key press
 window.addEventListener('keydown', event => {
+    event.preventDefault(); // Prevent default scrolling behavior
     changeDirection(event.key);
 });
 
 // Change direction based on button press
 function changeDirection(key) {
-    if (key === 'ArrowUp' && direction.y === 0) direction = { x: 0, y: -1 };
-    if (key === 'ArrowDown' && direction.y === 0) direction = { x: 0, y: 1 };
-    if (key === 'ArrowLeft' && direction.x === 0) direction = { x: -1, y: 0 };
-    if (key === 'ArrowRight' && direction.x === 0) direction = { x: 1, y: 0 };
+    const newDirection = { x: 0, y: 0 };
+    
+    switch(key) {
+        case 'ArrowUp':
+            newDirection.y = -1;
+            break;
+        case 'ArrowDown':
+            newDirection.y = 1;
+            break;
+        case 'ArrowLeft':
+            newDirection.x = -1;
+            break;
+        case 'ArrowRight':
+            newDirection.x = 1;
+            break;
+    }
+    
+    // Prevent 180-degree turns
+    if (newDirection.x !== 0 && direction.x === 0) {
+        direction = newDirection;
+    } else if (newDirection.y !== 0 && direction.y === 0) {
+        direction = newDirection;
+    }
 }
 
-// Add event listeners for mobile controls
+// Add event listeners for mobile controls with touch events
 const upButton = document.getElementById('up');
 const downButton = document.getElementById('down');
 const leftButton = document.getElementById('left');
 const rightButton = document.getElementById('right');
 
-upButton.addEventListener('click', () => changeDirection('ArrowUp'));
-downButton.addEventListener('click', () => changeDirection('ArrowDown'));
-leftButton.addEventListener('click', () => changeDirection('ArrowLeft'));
-rightButton.addEventListener('click', () => changeDirection('ArrowRight'));
+function addMobileControlListeners(button, direction) {
+    button.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        changeDirection(direction);
+    });
+    button.addEventListener('click', () => changeDirection(direction));
+}
 
-// Start the game loop
-let gameLoop = setInterval(draw, speed);
+addMobileControlListeners(upButton, 'ArrowUp');
+addMobileControlListeners(downButton, 'ArrowDown');
+addMobileControlListeners(leftButton, 'ArrowLeft');
+addMobileControlListeners(rightButton, 'ArrowRight');
 
 // Initialize the game
 placeFood();
-placeObstacles(); 
+placeObstacles();
+// Don't start the game loop here, wait for start button click 
